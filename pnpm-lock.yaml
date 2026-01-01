@@ -36,6 +36,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^7.0.0
         version: 7.18.0(eslint@8.57.1)(typescript@5.5.4)
+      astro-eslint-parser:
+        specifier: ^1.2.2
+        version: 1.2.2
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
