@@ -23,7 +23,13 @@ import { siteConfig, getPhoneLink, getWhatsappLink } from "../lib/site";
           <h3 class="card__title">WhatsApp</h3>
           <p class="card__text">Быстрые ответы и консультации (заменить номер).</p>
           <div style="margin-top:14px;">
-            <a class="btn btn--accent" href={getWhatsappLink()} target="_blank" rel="noopener">
+            <a
+              class="btn btn--accent"
+              href={getWhatsappLink()}
+              target="_blank"
+              rel="noopener"
+              data-of-placement="contact_whatsapp"
+            >
               Написать в WhatsApp
             </a>
           </div>
@@ -35,7 +41,9 @@ import { siteConfig, getPhoneLink, getWhatsappLink } from "../lib/site";
           <h3 class="card__title">Телефон</h3>
           <p class="card__text">{siteConfig.supportPhone}</p>
           <div style="margin-top:14px;">
-            <a class="btn btn--primary" href={getPhoneLink()}>Позвонить</a>
+            <a class="btn btn--primary" href={getPhoneLink()} data-of-placement="contact_call"
+              >Позвонить</a
+            >
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ const {
   description = "Премиальная спортивная одежда в Казахстане.",
   ogImage = "/assets/img/og-image.svg",
   canonical,
+  analytics,
 } = Astro.props;
 
 const pathname = Astro.url.pathname;
@@ -19,6 +20,14 @@ const nav = [
   { href: "/faq", label: "FAQ" },
   { href: "/contact", label: "Контакты" },
 ];
+
+const analyticsConfig = {
+  gaId: import.meta.env.PUBLIC_GA_ID ?? "",
+  metaPixelId: import.meta.env.PUBLIC_META_PIXEL_ID ?? "",
+  tiktokPixelId: import.meta.env.PUBLIC_TIKTOK_PIXEL_ID ?? "",
+  consentCookie: import.meta.env.PUBLIC_ANALYTICS_CONSENT_COOKIE ?? "of_consent",
+  requireConsent: import.meta.env.PUBLIC_ANALYTICS_REQUIRE_CONSENT === "1",
+};
 ---
 
 <!doctype html>
@@ -73,10 +82,16 @@ const nav = [
         </nav>
 
         <div class="header__actions">
-          <a class="btn btn--ghost" href={getWhatsappLink()} target="_blank" rel="noopener"
-            >WhatsApp</a
+          <a
+            class="btn btn--ghost"
+            href={getWhatsappLink()}
+            target="_blank"
+            rel="noopener"
+            data-of-placement="header_whatsapp">WhatsApp</a
           >
-          <a class="btn btn--ghost" href={getPhoneLink()}>Позвонить</a>
+          <a class="btn btn--ghost" href={getPhoneLink()} data-of-placement="header_call"
+            >Позвонить</a
+          >
         </div>
       </div>
     </header>
@@ -207,6 +222,286 @@ const nav = [
             }
           });
           link.setAttribute("href", url.pathname + url.search);
+        });
+      })();
+    </script>
+    <script
+      type="application/json"
+      id="of-analytics-config"
+      set:html={JSON.stringify(analyticsConfig)}
+    />
+    {
+      analytics ? (
+        <script type="application/json" id="of-analytics" set:html={JSON.stringify(analytics)} />
+      ) : null
+    }
+    <script is:inline>
+      (function () {
+        var config = {};
+        var configNode = document.getElementById("of-analytics-config");
+        if (configNode) {
+          try {
+            config = JSON.parse(configNode.textContent || "{}");
+          } catch (e) {
+            config = {};
+          }
+        }
+        var hasIds = Boolean(config.gaId || config.metaPixelId || config.tiktokPixelId);
+        var consentCookie = config.consentCookie || "of_consent";
+        var requireConsent = Boolean(config.requireConsent);
+
+        function hasConsent() {
+          if (!requireConsent) return true;
+          return document.cookie.indexOf(consentCookie + "=1") !== -1;
+        }
+
+        if (!hasIds || !hasConsent()) return;
+
+        var queue = [];
+        var sent = {};
+
+        function readStored() {
+          var stored = {};
+          try {
+            stored = JSON.parse(localStorage.getItem("of_utm") || "{}") || {};
+          } catch (e) {
+            stored = {};
+          }
+          return stored;
+        }
+
+        function buildPayload(extra) {
+          var stored = readStored();
+          var payload = Object.assign(
+            {
+              of_cid: stored.of_cid || localStorage.getItem("of_cid") || "",
+              utm_source: stored.utm_source || "",
+              utm_medium: stored.utm_medium || "",
+              utm_campaign: stored.utm_campaign || "",
+              utm_content: stored.utm_content || "",
+              utm_term: stored.utm_term || "",
+              fbclid: stored.fbclid || "",
+              ttclid: stored.ttclid || "",
+              gclid: stored.gclid || "",
+            },
+            extra || {}
+          );
+          return payload;
+        }
+
+        function sendEvent(name, params) {
+          var payload = buildPayload(params);
+          if (window.gtag) {
+            window.gtag("event", name, payload);
+          } else {
+            queue.push([name, payload]);
+          }
+          if (window.fbq) {
+            window.fbq("trackCustom", name, payload);
+          }
+          if (window.ttq) {
+            window.ttq.track(name, payload);
+          }
+        }
+
+        function flushQueue() {
+          if (!window.gtag) return;
+          while (queue.length) {
+            var item = queue.shift();
+            window.gtag("event", item[0], item[1]);
+          }
+        }
+
+        function loadGtag() {
+          if (!config.gaId || window.gtag) return;
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            window.dataLayer.push(arguments);
+          }
+          window.gtag = gtag;
+          gtag("js", new Date());
+          gtag("config", config.gaId, { send_page_view: false });
+          var s = document.createElement("script");
+          s.async = true;
+          s.src = "https://www.googletagmanager.com/gtag/js?id=" + config.gaId;
+          document.head.appendChild(s);
+        }
+
+        function loadMeta() {
+          if (!config.metaPixelId || window.fbq) return;
+          !(function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+              n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = true;
+            n.version = "2.0";
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = true;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s);
+          })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+          window.fbq("init", config.metaPixelId);
+          window.fbq("track", "PageView");
+        }
+
+        function loadTiktok() {
+          if (!config.tiktokPixelId || window.ttq) return;
+          !(function (w, d, t) {
+            w.TiktokAnalyticsObject = t;
+            var ttq = (w[t] = w[t] || []);
+            ttq.methods = [
+              "page",
+              "track",
+              "identify",
+              "instances",
+              "debug",
+              "on",
+              "off",
+              "once",
+              "ready",
+              "alias",
+              "group",
+              "enableCookie",
+              "disableCookie",
+            ];
+            ttq.setAndDefer = function (t, e) {
+              t[e] = function () {
+                t.push([e].concat([].slice.call(arguments, 0)));
+              };
+            };
+            for (var i = 0; i < ttq.methods.length; i++) {
+              ttq.setAndDefer(ttq, ttq.methods[i]);
+            }
+            ttq.instance = function (t) {
+              var e = ttq._i[t] || [];
+              for (var n = 0; n < ttq.methods.length; n++) {
+                ttq.setAndDefer(e, ttq.methods[n]);
+              }
+              return e;
+            };
+            ttq.load = function (e, n) {
+              var i = "https://analytics.tiktok.com/i18n/pixel/events.js";
+              ttq._i = ttq._i || {};
+              ttq._i[e] = [];
+              ttq._i[e]._u = i;
+              ttq._t = ttq._t || {};
+              ttq._t[e] = +new Date();
+              ttq._o = ttq._o || {};
+              ttq._o[e] = n || {};
+              var o = d.createElement("script");
+              o.type = "text/javascript";
+              o.async = true;
+              o.src = i + "?sdkid=" + e + "&lib=" + t;
+              var a = d.getElementsByTagName("script")[0];
+              a.parentNode.insertBefore(o, a);
+            };
+          })(window, document, "ttq");
+          window.ttq.load(config.tiktokPixelId);
+          window.ttq.page();
+        }
+
+        function deferLoad(fn) {
+          if (document.readyState === "complete") {
+            if ("requestIdleCallback" in window) {
+              window.requestIdleCallback(fn, { timeout: 1500 });
+            } else {
+              setTimeout(fn, 1200);
+            }
+            return;
+          }
+          window.addEventListener(
+            "load",
+            function () {
+              if ("requestIdleCallback" in window) {
+                window.requestIdleCallback(fn, { timeout: 1500 });
+              } else {
+                setTimeout(fn, 800);
+              }
+            },
+            { once: true }
+          );
+        }
+
+        deferLoad(function () {
+          loadGtag();
+          loadMeta();
+          loadTiktok();
+          flushQueue();
+
+          if (!sent.page_view) {
+            sent.page_view = true;
+            sendEvent("page_view", {
+              page_location: window.location.href,
+              page_title: document.title,
+            });
+          }
+
+          var node = document.getElementById("of-analytics");
+          if (node) {
+            try {
+              var payload = JSON.parse(node.textContent || "{}");
+              if (payload.page_type === "view_item_list" && !sent.view_item_list) {
+                sent.view_item_list = true;
+                sendEvent("view_item_list", payload);
+              }
+              if (payload.page_type === "view_item" && !sent.view_item) {
+                sent.view_item = true;
+                sendEvent("view_item", payload);
+              }
+            } catch (e) {}
+          }
+        });
+
+        var scrollMarks = [25, 50, 75, 90];
+        var seen = {};
+        var scrollTick = false;
+        function onScroll() {
+          if (scrollTick) return;
+          scrollTick = true;
+          requestAnimationFrame(function () {
+            var h = document.documentElement;
+            var scrollTop = h.scrollTop || document.body.scrollTop;
+            var scrollHeight = h.scrollHeight - h.clientHeight;
+            var percent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            scrollMarks.forEach(function (mark) {
+              if (!seen[mark] && percent >= mark) {
+                seen[mark] = true;
+                sendEvent("scroll_depth", { percent: mark });
+              }
+            });
+            scrollTick = false;
+          });
+        }
+        window.addEventListener("scroll", onScroll, { passive: true });
+
+        document.addEventListener("click", function (event) {
+          var target = event.target;
+          if (!target) return;
+          var link = target.closest ? target.closest("a") : null;
+          if (!link) return;
+          var href = link.getAttribute("href") || "";
+          var placement = link.getAttribute("data-of-placement") || "";
+
+          if (href.indexOf("/go/kaspi/") === 0) {
+            var parts = href.split("?")[0].split("/");
+            var slug = parts.length ? parts[parts.length - 1] : "";
+            sendEvent("cta_click_to_kaspi", { slug: slug, placement: placement, href: href });
+            return;
+          }
+
+          if (href.indexOf("https://wa.me") === 0) {
+            sendEvent("contact_click_whatsapp", { placement: placement, href: href });
+            return;
+          }
+
+          if (href.indexOf("tel:") === 0) {
+            sendEvent("contact_click_call", { placement: placement, href: href });
+          }
         });
       })();
     </script>

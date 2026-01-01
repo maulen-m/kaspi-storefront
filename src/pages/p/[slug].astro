@@ -20,9 +20,25 @@ if (!product) {
 }
 
 const image = product.images?.[0] ?? "/assets/img/placeholder.svg";
+const analytics = {
+  page_type: "view_item",
+  items: [
+    {
+      item_id: product.id,
+      item_name: product.title_ru,
+      item_category: product.category,
+      item_slug: product.slug,
+      price: product.price_kzt ?? undefined,
+    },
+  ],
+};
 ---
 
-<BaseLayout title={`${product.title_ru} — ACMEWEAR`} description={product.bullets_ru?.[0] ?? ""}>
+<BaseLayout
+  title={`${product.title_ru} — ACMEWEAR`}
+  description={product.bullets_ru?.[0] ?? ""}
+  analytics={analytics}
+>
   <div class="container">
     <div class="breadcrumbs">
       <a href="/">Главная</a> /
@@ -77,11 +93,21 @@ const image = product.images?.[0] ?? "/assets/img/placeholder.svg";
         </div>
 
         <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn--primary" href={`/go/kaspi/${product.slug}`}>Купить в Kaspi</a>
-          <a class="btn btn--ghost" href={getWhatsappLink()} target="_blank" rel="noopener"
-            >WhatsApp</a
+          <a
+            class="btn btn--primary"
+            href={`/go/kaspi/${product.slug}`}
+            data-of-placement="product_detail">Купить в Kaspi</a
           >
-          <a class="btn btn--ghost" href={getPhoneLink()}>Позвонить</a>
+          <a
+            class="btn btn--ghost"
+            href={getWhatsappLink()}
+            target="_blank"
+            rel="noopener"
+            data-of-placement="product_detail_whatsapp">WhatsApp</a
+          >
+          <a class="btn btn--ghost" href={getPhoneLink()} data-of-placement="product_detail_call"
+            >Позвонить</a
+          >
         </div>
 
         <div style="margin-top:16px; font-size:12px; color: var(--muted);">

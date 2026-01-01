@@ -28,7 +28,11 @@ const image = product.images?.[0] ?? "/assets/img/placeholder.svg";
     </div>
     <div class="product__actions">
       <a class="btn btn--ghost" href={`/p/${product.slug}`}>Подробнее</a>
-      <a class="btn btn--primary" href={`/go/kaspi/${product.slug}`}>Купить в Kaspi</a>
+      <a
+        class="btn btn--primary"
+        href={`/go/kaspi/${product.slug}`}
+        data-of-placement="product_card">Купить в Kaspi</a
+      >
     </div>
   </div>
 </article>
