@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="ACMEWEAR Open Graph placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0B0B0C"/>
+      <stop offset="1" stop-color="#1B1B1F"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="120" cy="120" r="34" fill="#B6FF3B"/>
+  <text x="120" y="310" font-family="Inter, Arial, sans-serif" font-size="84" font-weight="800" letter-spacing="10" fill="#FFFFFF">ACMEWEAR</text>
+  <text x="120" y="380" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="600" letter-spacing="2" fill="#FFFFFF" opacity="0.85">Premium Sportswear in Kazakhstan</text>
+  <text x="120" y="450" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="500" fill="#FFFFFF" opacity="0.70">Replace this image later with a real brand visual</text>
+</svg>

@@ -1,0 +1,143 @@
+---
+import { siteConfig, getPhoneLink, getWhatsappLink } from "../lib/site";
+
+const {
+  title = "ACMEWEAR",
+  description = "Премиальная спортивная одежда в Казахстане.",
+  ogImage = "/assets/img/og-image.svg",
+  canonical,
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const canonicalUrl = canonical ?? `${siteConfig.domain}${pathname}`;
+const year = new Date().getFullYear();
+const nav = [
+  { href: "/", label: "Главная" },
+  { href: "/shop", label: "Магазин" },
+  { href: "/size-guide", label: "Размеры" },
+  { href: "/delivery-returns", label: "Доставка" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Контакты" },
+];
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:site_name" content={siteConfig.brand} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={`${siteConfig.domain}${ogImage}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+    <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div class="announce">
+      <div class="container">
+        <div>Премиальная спортивная одежда в Казахстане • <strong>ACMEWEAR</strong></div>
+        <div><a href="/contact">{siteConfig.supportEmail}</a> (заполнить)</div>
+      </div>
+    </div>
+
+    <header class="header">
+      <div class="container header__bar">
+        <a class="brand" href="/" aria-label="ACMEWEAR home">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__name">ACMEWEAR</span>
+        </a>
+
+        <nav class="nav" aria-label="Primary">
+          {
+            nav.map((item) => (
+              <a class={`nav__link ${pathname === item.href ? "is-active" : ""}`} href={item.href}>
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+
+        <div class="header__actions">
+          <a class="btn btn--ghost" href={getWhatsappLink()} target="_blank" rel="noopener"
+            >WhatsApp</a
+          >
+          <a class="btn btn--ghost" href={getPhoneLink()}>Позвонить</a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__grid">
+          <div>
+            <div class="brand" style="color:#fff; margin-bottom:12px;">
+              <span class="brand__mark" aria-hidden="true"></span>
+              <span class="brand__name">ACMEWEAR</span>
+            </div>
+            <p class="footer__text">
+              Премиальный спортивный бренд в Казахстане. Минимализм, точная посадка, надежный
+              комфорт.
+            </p>
+            <p class="footer__text" style="margin-top:12px;">
+              <strong>Email:</strong>
+              {siteConfig.supportEmail}
+              <br />
+              <strong>Телефон:</strong>
+              {siteConfig.supportPhone}
+              <br />
+              <strong>Адрес:</strong> Алматы, Казахстан (заполнить)
+            </p>
+          </div>
+          <div>
+            <p class="footer__title">Магазин</p>
+            <ul class="footer__list">
+              <li><a href="/shop">Все товары</a></li>
+              <li><a href="/delivery-returns">Доставка и возврат</a></li>
+              <li><a href="/size-guide">Размеры</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="footer__title">Компания</p>
+            <ul class="footer__list">
+              <li><a href="/contact">Контакты</a></li>
+              <li><a href="/faq">FAQ</a></li>
+              <li><a href="/policies/privacy">Политика</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="footer__title">Правовые документы</p>
+            <ul class="footer__list">
+              <li><a href="/policies/terms">Пользовательское соглашение</a></li>
+              <li><a href="/policies/privacy">Политика конфиденциальности</a></li>
+              <li><a href="/policies/payment">Оплата</a></li>
+              <li><a href="/policies/shipping-returns">Доставка и возврат</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer__bottom">
+          <div>© {year} ACMEWEAR. Все права защищены.</div>
+          <div>Kaspi-first запуск.</div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

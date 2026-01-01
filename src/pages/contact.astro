@@ -1,0 +1,68 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { siteConfig, getPhoneLink, getWhatsappLink } from "../lib/site";
+---
+
+<BaseLayout
+  title="Контакты — ACMEWEAR"
+  description="Свяжитесь с ACMEWEAR через WhatsApp или телефон."
+>
+  <div class="container">
+    <div class="section__head" style="margin-top:0;">
+      <div>
+        <h1 class="section__title" style="font-size: var(--step-3); margin:0;">Контакты</h1>
+        <p class="section__sub" style="margin-top:8px;">
+          Основной канал продаж — Kaspi. Для вопросов пишите в WhatsApp или звоните.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card" style="grid-column: span 4;">
+        <div class="card__pad">
+          <h3 class="card__title">WhatsApp</h3>
+          <p class="card__text">Быстрые ответы и консультации (заменить номер).</p>
+          <div style="margin-top:14px;">
+            <a class="btn btn--accent" href={getWhatsappLink()} target="_blank" rel="noopener">
+              Написать в WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column: span 4;">
+        <div class="card__pad">
+          <h3 class="card__title">Телефон</h3>
+          <p class="card__text">{siteConfig.supportPhone}</p>
+          <div style="margin-top:14px;">
+            <a class="btn btn--primary" href={getPhoneLink()}>Позвонить</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="grid-column: span 4;">
+        <div class="card__pad">
+          <h3 class="card__title">Email</h3>
+          <p class="card__text">{siteConfig.supportEmail}</p>
+          <div style="margin-top:14px;">
+            <a class="btn btn--ghost" href={`mailto:${siteConfig.supportEmail}`}
+              >Написать на email</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="section__head">
+        <div>
+          <h2 class="section__title">Адрес</h2>
+          <p class="section__sub">Алматы, Казахстан (заполнить точный адрес).</p>
+        </div>
+      </div>
+      <div class="panel">
+        <p class="card__text">График: 10:00–19:00 (placeholder).</p>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

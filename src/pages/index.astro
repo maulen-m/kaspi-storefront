@@ -1,0 +1,130 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProductCard from "../components/ProductCard.astro";
+import { getFeaturedProducts } from "../lib/products";
+
+const featured = getFeaturedProducts(4);
+---
+
+<BaseLayout
+  title="ACMEWEAR — Премиальная спортивная одежда"
+  description="ACMEWEAR — минималистичный спортивный бренд из Казахстана. Покупки через Kaspi."
+>
+  <div class="container">
+    <section class="hero">
+      <div class="hero__copy">
+        <div class="kicker"><span class="dot"></span> Premium performance • KZ</div>
+        <h1>Движение без компромиссов.</h1>
+        <p>
+          ACMEWEAR — минималистичная спортивная одежда для тренировок и повседневного движения.
+          Покупки — через Kaspi.
+        </p>
+        <div class="hero__cta">
+          <a class="btn btn--primary" href="/go/kaspi/store">Купить в Kaspi</a>
+          <a class="btn btn--ghost" href="/shop">Смотреть коллекции</a>
+          <a class="btn btn--accent" href="/contact">Написать в WhatsApp</a>
+        </div>
+        <div style="margin-top:18px; color: var(--muted); font-size: 12px;">
+          Email для верификации: <strong>support@acmewear.kz</strong> (заменить)
+        </div>
+      </div>
+
+      <div class="hero__media">
+        <img src="/assets/img/hero-1.png" alt="ACMEWEAR спортивная одежда" loading="lazy" />
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <div>
+          <h2 class="section__title">Коллекции</h2>
+          <p class="section__sub">Минималистичные блоки, четкие линии, готовность к Kaspi.</p>
+        </div>
+        <a class="btn btn--ghost" href="/shop">Все товары</a>
+      </div>
+
+      <div class="grid">
+        <article class="card catcard">
+          <div class="card__media">
+            <img src="/assets/img/placeholder.svg" alt="Топы" />
+          </div>
+          <div class="card__pad">
+            <h3 class="card__title">Топы</h3>
+            <p class="card__text">Футболки и лонгсливы с чистым силуэтом.</p>
+            <div class="pillrow">
+              <a class="pill" href="/shop">Смотреть</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card catcard">
+          <div class="card__media">
+            <img src="/assets/img/placeholder.svg" alt="Низ" />
+          </div>
+          <div class="card__pad">
+            <h3 class="card__title">Низ</h3>
+            <p class="card__text">Леггинсы, шорты и брюки для тренинга.</p>
+            <div class="pillrow">
+              <a class="pill" href="/shop">Смотреть</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card catcard">
+          <div class="card__media">
+            <img src="/assets/img/placeholder.svg" alt="Комплекты" />
+          </div>
+          <div class="card__pad">
+            <h3 class="card__title">Комплекты и аксессуары</h3>
+            <p class="card__text">Сеты и аксессуары для завершенного образа.</p>
+            <div class="pillrow">
+              <a class="pill" href="/shop">Смотреть</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <div>
+          <h2 class="section__title">Избранное</h2>
+          <p class="section__sub">Ключевые позиции перед запуском.</p>
+        </div>
+      </div>
+      <div class="product-grid">
+        {featured.map((product) => <ProductCard product={product} />)}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section__head">
+        <div>
+          <h2 class="section__title">Почему ACMEWEAR</h2>
+          <p class="section__sub">Три ключевых причины доверять бренду.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <article class="card" style="grid-column: span 4;">
+          <div class="card__pad">
+            <h3 class="card__title">Kaspi-first</h3>
+            <p class="card__text">Покупка через Kaspi Super App без лишних шагов.</p>
+          </div>
+        </article>
+        <article class="card" style="grid-column: span 4;">
+          <div class="card__pad">
+            <h3 class="card__title">Минимализм</h3>
+            <p class="card__text">Чистые формы, строгая типографика, уверенный стиль.</p>
+          </div>
+        </article>
+        <article class="card" style="grid-column: span 4;">
+          <div class="card__pad">
+            <h3 class="card__title">Операции в КЗ</h3>
+            <p class="card__text">Коммуникация, доставка и сервис в Казахстане.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+</BaseLayout>

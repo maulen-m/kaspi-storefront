@@ -1,0 +1,34 @@
+---
+import type { Product } from "../lib/products";
+import { formatKZT } from "../lib/format";
+
+const { product } = Astro.props as { product: Product };
+const image = product.images?.[0] ?? "/assets/img/placeholder.svg";
+---
+
+<article class="product">
+  <a href={`/p/${product.slug}`} aria-label={`Открыть ${product.title_ru}`}>
+    <div class="product__media">
+      <img src={image} alt={product.title_ru} loading="lazy" />
+    </div>
+  </a>
+  <div class="product__body">
+    <div class="product__meta">
+      <div style="min-width:0;">
+        <p class="product__name">{product.title_ru}</p>
+        <p class="product__cat">{product.category}</p>
+      </div>
+      {
+        product.price_kzt ? (
+          <div class="product__price">{formatKZT(product.price_kzt)}</div>
+        ) : (
+          <div class="product__price">—</div>
+        )
+      }
+    </div>
+    <div class="product__actions">
+      <a class="btn btn--ghost" href={`/p/${product.slug}`}>Подробнее</a>
+      <a class="btn btn--primary" href={`/go/kaspi/${product.slug}`}>Купить в Kaspi</a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,94 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { allProducts, getProductBySlug } from "../../lib/products";
+import { formatKZT } from "../../lib/format";
+import { getPhoneLink, getWhatsappLink } from "../../lib/site";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  return allProducts.map((product) => ({
+    params: { slug: product.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const product = getProductBySlug(slug ?? "");
+
+if (!product) {
+  return Astro.redirect("/shop");
+}
+
+const image = product.images?.[0] ?? "/assets/img/placeholder.svg";
+---
+
+<BaseLayout title={`${product.title_ru} — ACMEWEAR`} description={product.bullets_ru?.[0] ?? ""}>
+  <div class="container">
+    <div class="breadcrumbs">
+      <a href="/">Главная</a> /
+      <a href="/shop">Магазин</a> /
+      <span>{product.title_ru}</span>
+    </div>
+
+    <div class="split">
+      <section class="gallery">
+        <div class="gallery__main">
+          <img src={image} alt={product.title_ru} />
+        </div>
+        <div class="gallery__thumbs">
+          <div class="thumb"><img src={image} alt={product.title_ru} /></div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="kicker"><span class="dot"></span> ACMEWEAR / {product.category}</div>
+        <h1
+          style="font-size: var(--step-3); line-height:1.05; margin: 14px 0 10px; letter-spacing:-.02em;"
+        >
+          {product.title_ru}
+        </h1>
+        <div
+          style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 10px;"
+        >
+          <div style="font-weight:900; font-size: 18px;">
+            {product.price_kzt ? formatKZT(product.price_kzt) : "—"}
+          </div>
+        </div>
+
+        <ul style="color: var(--muted); margin: 0 0 14px; padding-left: 18px;">
+          {product.bullets_ru.map((bullet) => <li>{bullet}</li>)}
+        </ul>
+
+        <div class="hr"></div>
+
+        <div style="margin-bottom:14px;">
+          <div
+            style="font-weight:900; letter-spacing:.12em; text-transform:uppercase; font-size:12px;"
+          >
+            Размеры
+          </div>
+          <div class="selector" style="margin-top:8px;">
+            {product.sizes.map((size) => <span class="choice">{size}</span>)}
+          </div>
+        </div>
+
+        <div class="notice">
+          <strong>Покупка через Kaspi:</strong> нажмите кнопку ниже, чтобы открыть предложение в Kaspi.
+        </div>
+
+        <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn btn--primary" href={`/go/kaspi/${product.slug}`}>Купить в Kaspi</a>
+          <a class="btn btn--ghost" href={getWhatsappLink()} target="_blank" rel="noopener"
+            >WhatsApp</a
+          >
+          <a class="btn btn--ghost" href={getPhoneLink()}>Позвонить</a>
+        </div>
+
+        <div style="margin-top:16px; font-size:12px; color: var(--muted);">
+          <strong>SKU:</strong>
+          {product.id}
+        </div>
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

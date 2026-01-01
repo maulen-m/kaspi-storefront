@@ -1,0 +1,85 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import { allProducts, categories } from "../../lib/products";
+
+const params = Astro.url.searchParams;
+const activeCategory = params.get("category") ?? "Все";
+const search = (params.get("q") ?? "").toLowerCase();
+
+const filtered = allProducts.filter((product) => {
+  const matchesCategory = activeCategory === "Все" ? true : product.category === activeCategory;
+  const haystack = `${product.title_ru} ${product.slug}`.toLowerCase();
+  const matchesSearch = search ? haystack.includes(search) : true;
+  return matchesCategory && matchesSearch;
+});
+---
+
+<BaseLayout
+  title="Магазин — ACMEWEAR"
+  description="Каталог ACMEWEAR: топы, низ, комплекты и аксессуары. Покупки через Kaspi."
+>
+  <div class="container">
+    <div class="section__head" style="margin-top:0;">
+      <div>
+        <h1 class="section__title" style="font-size: var(--step-3); margin:0;">Магазин</h1>
+        <p class="section__sub" style="margin-top:8px;">
+          Выберите продукт и перейдите в Kaspi для покупки.
+        </p>
+      </div>
+      <div
+        style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; justify-content:flex-end;"
+      >
+        <form style="min-width:240px;" method="get" action="/shop">
+          <div
+            style="font-weight:900; letter-spacing:.12em; text-transform:uppercase; font-size:12px; margin-bottom:8px;"
+          >
+            Поиск
+          </div>
+          <input
+            name="q"
+            value={search}
+            class="field"
+            style="width:100%; border:1px solid var(--line); border-radius:999px; padding:12px 14px; font:inherit;"
+            placeholder="Поиск товаров"
+          />
+          <input
+            type="hidden"
+            name="category"
+            value={activeCategory !== "Все" ? activeCategory : ""}
+          />
+        </form>
+        <div
+          style="color: var(--muted); font-weight:800; font-size: 12px; letter-spacing:.08em; text-transform:uppercase;"
+        >
+          {filtered.length} товаров
+        </div>
+      </div>
+    </div>
+
+    <div class="pillrow" style="margin-bottom:18px;">
+      {
+        categories.map((category) => (
+          <a
+            class={`pill ${category === activeCategory ? "is-active" : ""}`}
+            href={`/shop?category=${encodeURIComponent(category === "Все" ? "" : category)}${
+              search ? `&q=${encodeURIComponent(search)}` : ""
+            }`}
+          >
+            {category}
+          </a>
+        ))
+      }
+    </div>
+
+    <div class="product-grid">
+      {filtered.map((product) => <ProductCard product={product} />)}
+    </div>
+
+    <div class="section" style="margin-top: var(--space-6);">
+      <div class="notice">
+        <strong>Kaspi-first:</strong> все покупки проходят через Kaspi, без корзины на сайте.
+      </div>
+    </div>
+  </div>
+</BaseLayout>

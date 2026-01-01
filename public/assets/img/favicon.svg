@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="ACMEWEAR favicon">
+  <rect width="64" height="64" rx="18" fill="#0B0B0C"/>
+  <circle cx="18" cy="18" r="6" fill="#B6FF3B"/>
+  <path d="M18 44V22h6v16h14v6H18Z" fill="#FFFFFF"/>
+  <path d="M42 44V22h6v22h-6Z" fill="#FFFFFF" opacity="0.85"/>
+</svg>

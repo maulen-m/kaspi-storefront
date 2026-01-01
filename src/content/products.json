@@ -1,0 +1,134 @@
+[
+  {
+    "id": "prod-001",
+    "slug": "performance-training-tee",
+    "title_ru": "Тренировочная футболка Performance",
+    "category": "Топы",
+    "price_kzt": 12990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Легкая ткань", "Комфортная посадка", "Минималистичный дизайн"],
+    "sizes": ["S", "M", "L", "XL"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/performance-training-tee"
+  },
+  {
+    "id": "prod-002",
+    "slug": "airflex-long-sleeve",
+    "title_ru": "Лонгслив AirFlex",
+    "category": "Топы",
+    "price_kzt": 15990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Дышащий материал", "Слой для прохладных тренировок", "Чистая геометрия"],
+    "sizes": ["S", "M", "L", "XL"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/airflex-long-sleeve"
+  },
+  {
+    "id": "prod-003",
+    "slug": "core-compression-leggings",
+    "title_ru": "Компрессионные леггинсы Core",
+    "category": "Низ",
+    "price_kzt": 18990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Поддержка мышц", "Чистая посадка", "Для тренировок и зала"],
+    "sizes": ["S", "M", "L", "XL"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/core-compression-leggings"
+  },
+  {
+    "id": "prod-004",
+    "slug": "stride-training-shorts",
+    "title_ru": "Шорты Stride 7\"",
+    "category": "Низ",
+    "price_kzt": 14990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Минимализм", "Свобода движения", "Базовый тренинг"],
+    "sizes": ["S", "M", "L", "XL"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/stride-training-shorts"
+  },
+  {
+    "id": "prod-005",
+    "slug": "seamless-sports-bra",
+    "title_ru": "Бесшовный спортивный бра",
+    "category": "Комплекты",
+    "price_kzt": 13990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Бесшовная посадка", "Ежедневная поддержка", "Чистые линии"],
+    "sizes": ["S", "M", "L"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/seamless-sports-bra"
+  },
+  {
+    "id": "prod-006",
+    "slug": "sculpt-set",
+    "title_ru": "Сет Sculpt (топ + леггинсы)",
+    "category": "Комплекты",
+    "price_kzt": 32990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Согласованный комплект", "Уверенная посадка", "Единый силуэт"],
+    "sizes": ["S", "M", "L", "XL"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/sculpt-set"
+  },
+  {
+    "id": "prod-007",
+    "slug": "motion-hoodie",
+    "title_ru": "Худи Motion",
+    "category": "Топы",
+    "price_kzt": 27990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Мягкий материал", "Структурированный силуэт", "Повседневный стиль"],
+    "sizes": ["S", "M", "L", "XL"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/motion-hoodie"
+  },
+  {
+    "id": "prod-008",
+    "slug": "track-pants",
+    "title_ru": "Брюки Track",
+    "category": "Низ",
+    "price_kzt": 25990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Чистый крой", "Разминка и поездки", "Комфорт"],
+    "sizes": ["S", "M", "L", "XL"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/track-pants"
+  },
+  {
+    "id": "prod-009",
+    "slug": "grip-training-socks",
+    "title_ru": "Носки Grip (3 пары)",
+    "category": "Аксессуары",
+    "price_kzt": 6990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Поддержка стопы", "Комфорт в движении", "Минималистичный стиль"],
+    "sizes": ["One Size"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/grip-training-socks"
+  },
+  {
+    "id": "prod-010",
+    "slug": "everyday-cap",
+    "title_ru": "Кепка Everyday",
+    "category": "Аксессуары",
+    "price_kzt": 9990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Низкий профиль", "Чистый логотип", "Ежедневный стиль"],
+    "sizes": ["One Size"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/everyday-cap"
+  },
+  {
+    "id": "prod-011",
+    "slug": "recover-crewneck",
+    "title_ru": "Свитшот Recover",
+    "category": "Топы",
+    "price_kzt": 24990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Премиальная ткань", "Для восстановления", "Минимализм"],
+    "sizes": ["S", "M", "L", "XL"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/recover-crewneck"
+  },
+  {
+    "id": "prod-012",
+    "slug": "minimal-gym-bag",
+    "title_ru": "Сумка Minimal Gym",
+    "category": "Аксессуары",
+    "price_kzt": 21990,
+    "images": ["/assets/img/placeholder.svg"],
+    "bullets_ru": ["Структурированная форма", "Чистая организация", "Ежедневный зал"],
+    "sizes": ["One Size"],
+    "kaspi_url": "https://kaspi.kz/shop/ACMEWEAR/p/minimal-gym-bag"
+  }
+]
