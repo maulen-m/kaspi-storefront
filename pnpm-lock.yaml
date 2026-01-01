@@ -10,14 +10,17 @@ importers:
     dependencies:
       astro:
         specifier: ^4.0.0
-        version: 4.16.19(rollup@4.54.0)(typescript@5.5.4)
+        version: 4.16.19(@types/node@20.19.27)(rollup@4.54.0)(typescript@5.5.4)
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.0
         version: 0.9.6(prettier-plugin-astro@0.13.0)(prettier@3.7.4)(typescript@5.5.4)
       '@astrojs/node':
         specifier: ^8.0.0
-        version: 8.3.4(astro@4.16.19(rollup@4.54.0)(typescript@5.5.4))
+        version: 8.3.4(astro@4.16.19(@types/node@20.19.27)(rollup@4.54.0)(typescript@5.5.4))
+      '@types/node':
+        specifier: ^20.11.0
+        version: 20.19.27
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.0.0
         version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.5.4))(eslint@8.57.1)(typescript@5.5.4)
@@ -41,7 +44,7 @@ importers:
         version: 5.5.4
       vitest:
         specifier: ^1.0.0
-        version: 1.6.1
+        version: 1.6.1(@types/node@20.19.27)
 
 packages:
 
@@ -690,6 +693,9 @@ packages:
 
   '@types/nlcst@2.0.3':
     resolution: {integrity: sha512-vSYNSDe6Ix3q+6Z7ri9lyWqgGhJTmzRjZRqyq15N0Z/1/UnVsno9G/N40NBijoYx2seFDIl0+B2mgAb9mezUCA==}
+
+  '@types/node@20.19.27':
+    resolution: {integrity: sha512-N2clP5pJhB2YnZJ3PIHFk5RkygRX5WO/5f0WC08tp0wd+sv0rsJk3MqWn3CbNmT2J505a5336jaQj4ph1AdMug==}
 
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
@@ -2295,6 +2301,9 @@ packages:
   ufo@1.6.1:
     resolution: {integrity: sha512-9a4/uxlTWJ4+a5i0ooc1rU7C7YOw3wT+UGqdeNNHWnOF9qcMBgLRS+4IYUqbczewFx4mLEig6gawh7X6mFlEkA==}
 
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
 
@@ -2672,9 +2681,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@8.3.4(astro@4.16.19(rollup@4.54.0)(typescript@5.5.4))':
+  '@astrojs/node@8.3.4(astro@4.16.19(@types/node@20.19.27)(rollup@4.54.0)(typescript@5.5.4))':
     dependencies:
-      astro: 4.16.19(rollup@4.54.0)(typescript@5.5.4)
+      astro: 4.16.19(@types/node@20.19.27)(rollup@4.54.0)(typescript@5.5.4)
       send: 0.19.2
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -3222,6 +3231,10 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
 
+  '@types/node@20.19.27':
+    dependencies:
+      undici-types: 6.21.0
+
   '@types/unist@3.0.3': {}
 
   '@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.5.4))(eslint@8.57.1)(typescript@5.5.4)':
@@ -3473,7 +3486,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro@4.16.19(rollup@4.54.0)(typescript@5.5.4):
+  astro@4.16.19(@types/node@20.19.27)(rollup@4.54.0)(typescript@5.5.4):
     dependencies:
       '@astrojs/compiler': 2.13.0
       '@astrojs/internal-helpers': 0.4.1
@@ -3529,8 +3542,8 @@ snapshots:
       tsconfck: 3.1.6(typescript@5.5.4)
       unist-util-visit: 5.0.0
       vfile: 6.0.3
-      vite: 5.4.21
-      vitefu: 1.1.1(vite@5.4.21)
+      vite: 5.4.21(@types/node@20.19.27)
+      vitefu: 1.1.1(vite@5.4.21(@types/node@20.19.27))
       which-pm: 3.0.1
       xxhash-wasm: 1.1.0
       yargs-parser: 21.1.1
@@ -5217,6 +5230,8 @@ snapshots:
 
   ufo@1.6.1: {}
 
+  undici-types@6.21.0: {}
+
   unified@11.0.5:
     dependencies:
       '@types/unist': 3.0.3
@@ -5296,13 +5311,13 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite-node@1.6.1:
+  vite-node@1.6.1(@types/node@20.19.27):
     dependencies:
       cac: 6.7.14
       debug: 4.4.3
       pathe: 1.1.2
       picocolors: 1.1.1
-      vite: 5.4.21
+      vite: 5.4.21(@types/node@20.19.27)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -5314,19 +5329,20 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.4.21:
+  vite@5.4.21(@types/node@20.19.27):
     dependencies:
       esbuild: 0.21.5
       postcss: 8.5.6
       rollup: 4.54.0
     optionalDependencies:
+      '@types/node': 20.19.27
       fsevents: 2.3.3
 
-  vitefu@1.1.1(vite@5.4.21):
+  vitefu@1.1.1(vite@5.4.21(@types/node@20.19.27)):
     optionalDependencies:
-      vite: 5.4.21
+      vite: 5.4.21(@types/node@20.19.27)
 
-  vitest@1.6.1:
+  vitest@1.6.1(@types/node@20.19.27):
     dependencies:
       '@vitest/expect': 1.6.1
       '@vitest/runner': 1.6.1
@@ -5345,9 +5361,11 @@ snapshots:
       strip-literal: 2.1.1
       tinybench: 2.9.0
       tinypool: 0.8.4
-      vite: 5.4.21
-      vite-node: 1.6.1
+      vite: 5.4.21(@types/node@20.19.27)
+      vite-node: 1.6.1(@types/node@20.19.27)
       why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@types/node': 20.19.27
     transitivePeerDependencies:
       - less
       - lightningcss
