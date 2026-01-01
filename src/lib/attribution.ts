@@ -1,0 +1,88 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+
+const ATTR_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "fbclid",
+  "ttclid",
+  "gclid",
+  "of_cid",
+] as const;
+
+export type AttributionSnapshot = {
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+  fbclid?: string;
+  ttclid?: string;
+  gclid?: string;
+  of_cid?: string;
+  landing_url?: string;
+  referrer?: string;
+  user_agent?: string;
+  ip?: string;
+};
+
+const parseCookies = (cookieHeader: string | null) => {
+  if (!cookieHeader) return {};
+  return cookieHeader.split(";").reduce<Record<string, string>>((acc, part) => {
+    const [rawKey, ...rest] = part.trim().split("=");
+    if (!rawKey) return acc;
+    acc[rawKey] = rest.join("=");
+    return acc;
+  }, {});
+};
+
+const readUtmCookie = (request: Request) => {
+  const cookies = parseCookies(request.headers.get("cookie"));
+  const raw = cookies.of_utm;
+  if (!raw) return {};
+  try {
+    const decoded = decodeURIComponent(raw);
+    return JSON.parse(decoded) as Record<string, string>;
+  } catch {
+    return {};
+  }
+};
+
+export const buildAttributionSnapshot = (request: Request): AttributionSnapshot => {
+  const url = new URL(request.url);
+  const cookieData = readUtmCookie(request);
+  const merged: AttributionSnapshot = { ...cookieData };
+
+  ATTR_KEYS.forEach((key) => {
+    const value = url.searchParams.get(key);
+    if (value) merged[key] = value;
+  });
+
+  merged.landing_url = merged.landing_url ?? url.href;
+  merged.referrer =
+    merged.referrer ?? request.headers.get("referer") ?? request.headers.get("referrer") ?? "";
+  merged.user_agent = request.headers.get("user-agent") ?? "";
+  merged.ip =
+    request.headers.get("cf-connecting-ip") ??
+    request.headers.get("x-forwarded-for") ??
+    request.headers.get("x-real-ip") ??
+    "";
+
+  return merged;
+};
+
+export const logClickOut = async (payload: Record<string, unknown>) => {
+  const logPath = process.env.CLICK_LOG_PATH;
+  const line = JSON.stringify(payload) + "\n";
+
+  if (!logPath) {
+    console.info("[kaspi]", line.trim());
+    return;
+  }
+
+  await fs.mkdir(path.dirname(logPath), { recursive: true });
+  await fs.appendFile(logPath, line, "utf8");
+};

@@ -139,5 +139,76 @@ const nav = [
         </div>
       </div>
     </footer>
+
+    <script is:inline>
+      (function () {
+        var keys = [
+          "utm_source",
+          "utm_medium",
+          "utm_campaign",
+          "utm_content",
+          "utm_term",
+          "fbclid",
+          "ttclid",
+          "gclid",
+        ];
+        var params = new URLSearchParams(window.location.search);
+        var stored = {};
+        try {
+          stored = JSON.parse(localStorage.getItem("of_utm") || "{}") || {};
+        } catch (e) {
+          stored = {};
+        }
+        var updated = false;
+        keys.forEach(function (key) {
+          if (params.has(key)) {
+            stored[key] = params.get(key) || "";
+            updated = true;
+          }
+        });
+
+        var ofCid = stored.of_cid || localStorage.getItem("of_cid");
+        if (!ofCid) {
+          if (window.crypto && window.crypto.randomUUID) {
+            ofCid = window.crypto.randomUUID();
+          } else {
+            ofCid = String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+          }
+          updated = true;
+        }
+        stored.of_cid = ofCid;
+        stored.landing_url = stored.landing_url || window.location.href;
+        stored.referrer = stored.referrer || document.referrer || "";
+
+        if (updated) {
+          localStorage.setItem("of_utm", JSON.stringify(stored));
+          localStorage.setItem("of_cid", ofCid);
+        }
+
+        var cookieValue = encodeURIComponent(JSON.stringify(stored));
+        document.cookie =
+          "of_utm=" + cookieValue + "; Path=/; Max-Age=" + 60 * 60 * 24 * 30 + "; SameSite=Lax";
+        document.cookie =
+          "of_cid=" +
+          encodeURIComponent(ofCid) +
+          "; Path=/; Max-Age=" +
+          60 * 60 * 24 * 30 +
+          "; SameSite=Lax";
+
+        var links = document.querySelectorAll('a[href^="/go/kaspi/"]');
+        links.forEach(function (link) {
+          var url = new URL(link.getAttribute("href"), window.location.origin);
+          if (!url.searchParams.get("of_cid")) {
+            url.searchParams.set("of_cid", ofCid);
+          }
+          keys.forEach(function (key) {
+            if (stored[key] && !url.searchParams.get(key)) {
+              url.searchParams.set(key, stored[key]);
+            }
+          });
+          link.setAttribute("href", url.pathname + url.search);
+        });
+      })();
+    </script>
   </body>
 </html>
