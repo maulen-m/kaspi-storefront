@@ -1,0 +1,28 @@
+{
+  "ci": {
+    "collect": {
+      "startServerCommand": "pnpm preview -- --port 4321",
+      "startServerReadyPattern": "Local:",
+      "url": [
+        "http://localhost:4321/",
+        "http://localhost:4321/shop",
+        "http://localhost:4321/p/performance-training-tee"
+      ],
+      "numberOfRuns": 1,
+      "settings": {
+        "preset": "desktop",
+        "onlyCategories": ["performance", "seo"],
+        "disableStorageReset": true
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.95 }],
+        "categories:seo": ["error", { "minScore": 0.9 }]
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}

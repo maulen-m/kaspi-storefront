@@ -1,7 +1,9 @@
 ---
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ProductCard from "../components/ProductCard.astro";
 import { getFeaturedProducts } from "../lib/products";
+import heroImage from "../assets/hero-1.png";
 
 const featured = getFeaturedProducts(4);
 ---
@@ -33,7 +35,17 @@ const featured = getFeaturedProducts(4);
       </div>
 
       <div class="hero__media">
-        <img src="/assets/img/hero-1.png" alt="ACMEWEAR спортивная одежда" loading="lazy" />
+        <Image
+          src={heroImage}
+          alt="ACMEWEAR спортивная одежда"
+          width={720}
+          height={720}
+          format="webp"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+          sizes="(max-width: 768px) 90vw, 520px"
+        />
       </div>
     </section>
 
