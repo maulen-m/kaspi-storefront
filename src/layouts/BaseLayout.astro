@@ -453,7 +453,9 @@ const analyticsConfig = {
                 sent.view_item = true;
                 sendEvent("view_item", payload);
               }
-            } catch (e) {}
+            } catch (e) {
+              // ignore malformed analytics payload
+            }
           }
         });
 
