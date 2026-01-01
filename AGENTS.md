@@ -1,85 +1,86 @@
-# AGENTS.md - ACMEWEAR Website (Option C: Next.js + Postgres)
-Purpose: single always-loaded brain for Codex/agents. Keep it short, factual, and operational.
+# AGENTS.md — ACMEWEAR Web (bridge site → Kaspi)
 
-## Current State (update when changed)
-- Static HTML/CSS/JS storefront with placeholder content and images.
-- Product catalog in assets/data/products.js; cart uses localStorage.
-- Checkout is UI-only; payments/orders are not wired.
-- Decision locked: migrate to Next.js (App Router) + Postgres + Prisma.
+Read orchestrator rules first:
 
-## Non-Negotiables
-- Preserve the existing visual language (square blocks, minimal, black/white + accent).
-- KZT only, no VAT. Do not introduce multi-currency or VAT logic.
-- No destructive git ops unless explicitly instructed.
-- No hardcoded secrets or production URLs; all config via env.
-- Do not edit secrets or .env files without human approval.
-- ~/Docs/Autonomous_business is read-only. Never modify it.
-- Idempotent operations only (migrations, seeds, backfills).
-- Placeholder policy must be followed (P# registry, no ad-hoc images).
+- ORCHESTRATOR: `AGENTS.md` in the control plane (agent-scripts-main)
 
-## Repo Entry Points (reference + target)
-- Legacy reference: index.html, shop.html, product.html, cart.html, checkout.html
-- Legacy reference: assets/css/styles.css and assets/js/*
-- Target app: app/ (routes, UI), app/api/ (events, orders)
-- Target data: prisma/schema.prisma, prisma/migrations/
-- Target config: .env (local), .env.example (tracked)
-- Placeholder registry: placeholders/images.json
+This file is the **local contract**: product goals + stack + gates.
 
-## Core Product Rules
-- Required actions: card checkout, Kaspi payment link, Kaspi product offer link, WhatsApp, tap-to-call.
-- UTM attribution must persist across sessions and be attached to orders and lead actions.
-- PaymentAdapter interface must abstract the payment provider.
-- All external links (Kaspi/WhatsApp/call) must be tracked as events.
+---
 
-## Placeholder Asset Policy (P#)
-- Use P# ids only (P#1, P#2, ...), never raw image filenames.
-- Registry lives at placeholders/images.json:
-  - { "P#1": "public/placeholders/placeholder.svg", "P#2": null }
-- If mapping is null, render a neutral placeholder image.
-- Keep unspecified placeholders as-is; do not invent real URLs.
+## 0) What this repo is
 
-## Local Dev (target stack)
-Preferred package manager: pnpm.
-1) pnpm install
-2) pnpm dev
-3) pnpm lint
-4) pnpm test (if present)
+A fast, mobile-first static site that converts traffic (IG/TikTok) into Kaspi purchase intent.
+There is NO on-site checkout in v1. The site’s job is:
 
-## DB + Migration Workflow (Prisma)
-- Define schema in prisma/schema.prisma.
-- Local: pnpm prisma migrate dev
-- Prod: pnpm prisma migrate deploy
-- Seed: pnpm prisma db seed (must be idempotent)
-- Use deterministic ids/handles for products and SKUs.
+- tell the story
+- route to Kaspi
+- log clicks reliably
 
-## Default Validation
-- Manual: home, shop, product, cart, checkout, order confirmation.
-- Track UTMs across sessions; verify order attribution snapshot.
-- Verify KZT formatting and no VAT display.
-- Verify Kaspi/WhatsApp/call links + event logging.
+---
 
-## Definition of Done
-- End-to-end flows work with KZT-only pricing and no VAT.
-- Orders persist with attribution snapshot and payment intent records.
-- UTM persistence works for onsite and external lead actions.
-- Placeholder P# registry exists and is enforced.
-- No hardcoded secrets or production URLs in code.
-- SEO basics updated (title/description/canonical/sitemap/robots).
+## 1) Stack (locked for v1)
 
-## Blast Radius Rule
-- Aim for <=5 files per change. If it grows, pause and re-scope.
+- Astro (static-first) + TypeScript
+- Hosting: Cloudflare Pages
+- Redirect + click logging: `/go/...` via Cloudflare Worker/Pages Functions
+- RU-first content; KZ later must be easy (no deep hardcoded strings)
 
-## Prompt Templates
+---
 
-### Template A - Implementation Task
-- Goal:
-- Constraints (visual language, no hardcoding, idempotent ops):
-- Files allowed to touch:
-- Validation steps:
-- Done means:
+## 2) Non‑negotiables
 
-### Template B - Review Request
-- Context pack: changed files + screenshots if UI changes
-- What changed + why:
-- Evidence: manual checks or test output
-- Risks/rollbacks:
+- Preserve existing visual language (square blocks, sharp borders, minimal).
+- Performance is a feature:
+  - Lighthouse >= 95 on key pages
+  - LCP < 2.5s, CLS < 0.1
+- Tracking is first-class:
+  - every outbound Kaspi click MUST go through `/go/...` and be logged
+- No hardcoded prod URLs or secrets.
+  - use env vars + safe defaults + documented config
+- No heavy deps “because AI suggested it”. Keep it lean.
+
+---
+
+## 3) Dev commands / gates (proof required)
+
+(Adjust if package scripts differ, but keep the concept.)
+
+- `pnpm install`
+- `pnpm lint`
+- `pnpm build`
+- `pnpm verify` (preferred umbrella gate if available)
+
+If CI exists, run the same gate locally before commit.
+
+---
+
+## 4) Codex autonomy envelope (web repo)
+
+Allowed without asking:
+
+- implement full feature slices (up to a few pages/components) as long as gates stay green
+- refactor small sections for clarity/perf
+- add analytics events + tests if present
+
+Must HALT + ask if:
+
+- changing analytics provider, hosting, routing architecture
+- adding a big new dependency
+- adding backend services beyond CF worker/functions
+
+---
+
+## 5) Oracle packs (how we do reviews)
+
+Default: changed-files-only pack (range based).
+Pack should include:
+
+- `AGENTS.md`
+- `package.json` + lockfile if changed
+- `src/pages/**`, `src/components/**`, `src/lib/**`
+- worker/functions code for `/go/...`
+- any tracking/analytics config
+- any docs touched
+
+If the repo does not yet have `scripts/oracle_pack.sh`, vendor it from the orchestrator repo (see Oracle integration section in the handoff).
