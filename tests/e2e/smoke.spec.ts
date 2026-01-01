@@ -8,7 +8,7 @@ test("home loads without console errors", async ({ page }) => {
   });
 
   await page.goto("/");
-  await expect(page.locator("text=ACMEWEAR")).toBeVisible();
+  await expect(page.getByRole("link", { name: "ACMEWEAR home" })).toBeVisible();
   expect(errors).toEqual([]);
 });
 
