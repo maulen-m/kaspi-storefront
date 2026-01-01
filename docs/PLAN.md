@@ -204,7 +204,47 @@ Validation:
 
 ---
 
-## M4 — Analytics + pixels (performance-safe)
+## M4 — Workflow acceleration + Oracle/repomix (UV method)
+
+Tasks:
+
+- Add cross-platform runners:
+  - `scripts/dev.sh` (fast-path install + pnpm dev)
+  - `scripts/preview.sh` (pnpm build + pnpm preview)
+  - `scripts/verify.sh` (pnpm verify)
+- Add double-click launchers (macOS):
+  - `tools/ACMEWEAR_DEV.command`
+  - `tools/ACMEWEAR_PREVIEW.command`
+  - `tools/ACMEWEAR_VERIFY.command`
+- Adopt Oracle pack workflow:
+  - `scripts/oracle_pack.sh` aligned with Autonomous_business logic
+  - output: `~/Docs/Oracle/<project>/<YYYY-MM-DD>/<HHMMSS>_<TASK>.md` (project defaults to repo folder name)
+- Repomix XML double-click:
+  - `~/Docs/Oracle/acmewear_web/repomix_acmewear_web.command`
+  - output XML copied into `~/Docs/Oracle/acmewear_web/<YYYY-MM-DD>/`
+
+UV method:
+
+- Always keep an undo command ready (git restore) + run `pnpm verify` before sharing.
+
+Acceptance:
+
+- One-click scripts are executable and documented here.
+- Oracle pack uses denylist (no secrets, no node_modules, no build artifacts).
+- Repomix command runs and writes XML into the date folder.
+
+Atomic commits:
+
+- chore: add workflow runners + commands
+- chore: align oracle pack script + repomix command
+
+Validation:
+
+- pnpm verify
+
+---
+
+## M5 — Analytics + pixels (performance-safe)
 
 Tasks:
 
@@ -238,7 +278,7 @@ Validation:
 
 ---
 
-## M5 — Performance hardening (budgets enforced)
+## M6 — Performance hardening (budgets enforced)
 
 Budgets:
 
@@ -267,7 +307,7 @@ Acceptance:
 
 ---
 
-## M6 — Deploy + rollback
+## M7 — Deploy + rollback
 
 Tasks:
 
@@ -283,7 +323,7 @@ Acceptance:
 
 ---
 
-## M7 — Campaign landers
+## M8 — Campaign landers
 
 Tasks:
 

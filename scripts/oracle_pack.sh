@@ -5,36 +5,36 @@ set -euo pipefail
 # Generate an Oracle context pack deterministically from git signals (no API usage required).
 #
 # Usage:
-#   scripts/oracle_pack.sh --task TASK-268 --range HEAD~1..HEAD
+#   scripts/oracle_pack.sh --task M0-M3 --range HEAD~1..HEAD
 #   scripts/oracle_pack.sh --task TASK-312 --range HEAD~3..HEAD --cmd "pnpm verify"
 #
 # Output:
-#   ~/Docs/Oracle/acmewear_web/<YYYY-MM-DD>/<HHMMSS>_<task>.md
+#   ~/Docs/Oracle/<project>/<YYYY-MM-DD>/<HHMMSS>_<task>.md
 
 TASK=""
 RANGE="HEAD~1..HEAD"
 OUT_ROOT="~/Docs/Oracle"
-PROJECT="acmewear_web"
+PROJECT=""
 MAX_BYTES="300000"
 ALLOW_DIRTY="false"
 PROMPT_TEMPLATE="review"
 CMDS=()
 
 usage() {
-  cat <<'EOF'
+  cat <<'EOF_USAGE'
 Usage:
   scripts/oracle_pack.sh --task <NAME> [--range <A..B>] [--out-root <DIR>] [--project <NAME>]
                          [--max-bytes <N>] [--allow-dirty] [--prompt <review|debug|plan>]
                          [--cmd "<command you ran>"]...
 
 Examples:
-  scripts/oracle_pack.sh --task TASK-268 --range HEAD~1..HEAD
+  scripts/oracle_pack.sh --task M0-M3 --range HEAD~1..HEAD
   scripts/oracle_pack.sh --task TASK-312 --range HEAD~3..HEAD --cmd "pnpm verify"
 
 Notes:
 - Default requires clean git status. Use --allow-dirty to pack working tree changes (less reproducible).
 - No API calls are made; this uses oracle --render and writes the bundle to disk.
-EOF
+EOF_USAGE
 }
 
 die() { echo "ERROR: $*" >&2; exit 1; }
@@ -57,6 +57,10 @@ done
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || die "Not a git repo"
 cd "$ROOT"
 
+if [[ -z "$PROJECT" ]]; then
+  PROJECT="$(basename "$ROOT")"
+fi
+
 BRANCH="$(git branch --show-current || true)"
 if [[ -z "$BRANCH" ]]; then
   BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
@@ -68,14 +72,29 @@ NOW_TIME="$(date +%H%M%S)"
 OUT_DIR="${OUT_ROOT}/${PROJECT}/${NOW_DATE}"
 mkdir -p "$OUT_DIR"
 
-if [[ -z "$TASK" ]]; then
-  if [[ "$BRANCH" =~ ^task/(TASK-[0-9]+) ]]; then
-    TASK="${BASH_REMATCH[1]}"
+derive_task_from_branch() {
+  local branch="$1"
+  if [[ "$branch" =~ ^task/(TASK-[0-9]+) ]]; then
+    echo "${BASH_REMATCH[1]}"
+    return 0
   fi
+  if [[ "$branch" =~ ^task/([A-Z]+[0-9]+) ]]; then
+    echo "${BASH_REMATCH[1]}"
+    return 0
+  fi
+  if [[ "$branch" =~ ^(TASK-[0-9]+) ]]; then
+    echo "${BASH_REMATCH[1]}"
+    return 0
+  fi
+  return 1
+}
+
+if [[ -z "$TASK" ]]; then
+  TASK="$(derive_task_from_branch "$BRANCH" || true)"
 fi
 
 if [[ -z "$TASK" ]]; then
-  die "Pass --task (e.g., TASK-268)."
+  die "Pass --task or rename branch to task/<TASK> (e.g., task/TASK-268-...)"
 fi
 
 OUT_FILE="${OUT_DIR}/${NOW_TIME}_${TASK}.md"
@@ -112,6 +131,7 @@ DIFF_FILE="${TMP_DIR}/0_DIFF.md"
 # Collect changed files (from range or working tree)
 CHANGED_FILES=()
 if [[ "$ALLOW_DIRTY" == "true" ]]; then
+  # include staged + unstaged changes (tracked only)
   while IFS= read -r line; do
     [[ -n "$line" ]] && CHANGED_FILES+=("$line")
   done < <( { git diff --name-only; git diff --cached --name-only; } | sort -u )
@@ -121,13 +141,43 @@ else
   done < <( git diff --name-only "$RANGE" | sort -u )
 fi
 
+is_sensitive_changed() {
+  local f="$1"
+  case "$f" in
+    .env|.env.*|.envrc|.npmrc|.pypirc|.netrc|.git-credentials|.sentryclirc) return 0;;
+    *.pem|*.key|*.p12|*.pfx|*.der|*.crt|*.cer|*.kdbx|*.asc|*.gpg|*.pgp) return 0;;
+  esac
+  return 1
+}
+
+SENSITIVE_CHANGED=()
+if [[ ${#CHANGED_FILES[@]} -gt 0 ]]; then
+  for f in "${CHANGED_FILES[@]}"; do
+    if is_sensitive_changed "$f"; then
+      SENSITIVE_CHANGED+=("$f")
+    fi
+  done
+fi
+
+if [[ ${#SENSITIVE_CHANGED[@]} -gt 0 ]]; then
+  echo "Sensitive files detected in changes; aborting pack to prevent leakage:"
+  printf -- "- %s\n" "${SENSITIVE_CHANGED[@]}"
+  echo "Fix: remove from changes, move secrets to .env, or update .gitignore."
+  exit 3
+fi
+
 # Allowlist high-signal files (only if they exist)
 ALWAYS_INCLUDE=(
   "AGENTS.md"
   "README.md"
+  "docs/PLAN.md"
   "astro.config.mjs"
   "package.json"
   "pnpm-lock.yaml"
+  "scripts/oracle_pack.sh"
+  "scripts/dev.sh"
+  "scripts/preview.sh"
+  "scripts/verify.sh"
   "src/layouts/BaseLayout.astro"
   "src/pages/index.astro"
   "src/pages/shop/index.astro"
@@ -138,24 +188,55 @@ ALWAYS_INCLUDE=(
   "src/lib/site.ts"
   "src/content/products.json"
   "public/assets/css/styles.css"
+  "tools/ACMEWEAR_DEV.command"
+  "tools/ACMEWEAR_PREVIEW.command"
+  "tools/ACMEWEAR_VERIFY.command"
 )
 
 # Denylist patterns (content excluded; diff still included)
 is_denied() {
   local f="$1"
   [[ "$f" == ".env" ]] && return 0
+  [[ "$f" == ".env."* ]] && return 0
+  [[ "$f" == ".envrc" ]] && return 0
+  [[ "$f" == ".npmrc" ]] && return 0
+  [[ "$f" == ".pypirc" ]] && return 0
+  [[ "$f" == ".netrc" ]] && return 0
+  [[ "$f" == ".git-credentials" ]] && return 0
+  [[ "$f" == ".astro/"* ]] && return 0
   [[ "$f" == "node_modules/"* ]] && return 0
   [[ "$f" == "dist/"* ]] && return 0
   [[ "$f" == "public/assets/img/"* ]] && return 0
+  [[ "$f" == "repomix-output.xml" ]] && return 0
   [[ "$f" == ".DS_Store" ]] && return 0
   [[ "$f" == *"/.DS_Store" ]] && return 0
   case "$f" in
-    *.pdf|*.png|*.jpg|*.jpeg|*.zip|*.sqlite|*.xlsx) return 0;;
+    *.pdf|*.png|*.jpg|*.jpeg|*.zip|*.sqlite|*.xlsx|*.log) return 0;;
   esac
   return 1
 }
 
-# Build final include list: changed (non-denied + existing) + allowlist
+is_tracked_artifact() {
+  local f="$1"
+  [[ "$f" == ".DS_Store" || "$f" == */.DS_Store ]] && return 0
+  [[ "$f" == ".astro/"* || "$f" == */.astro/* ]] && return 0
+  [[ "$f" == "node_modules/"* || "$f" == */node_modules/* ]] && return 0
+  [[ "$f" == "dist/"* || "$f" == */dist/* ]] && return 0
+  return 1
+}
+
+TRACKED_ARTIFACTS=()
+while IFS= read -r path; do
+  [[ -n "$path" ]] || continue
+  if is_tracked_artifact "$path"; then
+    TRACKED_ARTIFACTS+=("$path")
+  fi
+done < <(git ls-files)
+
+# Optional policy-based adds (none for acmewear yet)
+POLICY_INCLUDE=()
+
+# Build final include list: changed (non-denied + existing) + allowlist + policy adds
 INCLUDE_FILES=()
 add_if_exists() {
   local f="$1"
@@ -163,6 +244,7 @@ add_if_exists() {
   INCLUDE_FILES+=("$f")
 }
 
+# changed files
 if [[ ${#CHANGED_FILES[@]} -gt 0 ]]; then
   for f in "${CHANGED_FILES[@]}"; do
     is_denied "$f" && continue
@@ -170,9 +252,17 @@ if [[ ${#CHANGED_FILES[@]} -gt 0 ]]; then
   done
 fi
 
+# allowlist
 for f in "${ALWAYS_INCLUDE[@]}"; do
   add_if_exists "$f"
 done
+
+# policy
+if [[ ${#POLICY_INCLUDE[@]} -gt 0 ]]; then
+  for f in "${POLICY_INCLUDE[@]}"; do
+    add_if_exists "$f"
+  done
+fi
 
 # de-dup include list
 DEDUPED_INCLUDE_FILES=()
@@ -245,7 +335,19 @@ fi
   fi
   echo
   echo "## Denylist (never include content)"
-  echo "- .env, node_modules/*, dist/*, public/assets/img/*, *.pdf, *.png, *.jpg, *.zip, *.sqlite, *.xlsx"
+  echo "- .env, .env.*, .envrc, .npmrc, .pypirc, .netrc, .git-credentials"
+  echo "- node_modules/*, dist/*, public/assets/img/*, .astro/*, repomix-output.xml"
+  echo "- *.pem, *.key, *.p12, *.pfx, *.der, *.crt, *.cer, *.kdbx, *.gpg, *.pgp"
+  echo "- *.pdf, *.png, *.jpg, *.zip, *.sqlite, *.xlsx"
+  if [[ ${#TRACKED_ARTIFACTS[@]} -gt 0 ]]; then
+    echo
+    echo "## Tracked artifact warnings"
+    echo "The following artifacts are tracked in git; consider removing via:"
+    echo "git rm --cached -- <path>"
+    for f in "${TRACKED_ARTIFACTS[@]}"; do
+      echo "- ${f}"
+    done
+  fi
 } > "$META_FILE"
 
 # Write diff (stat + full diff)
@@ -293,13 +395,30 @@ case "$PROMPT_TEMPLATE" in
     ;;
 esac
 
-# Assemble file args: meta + diff + excerpts + content files
+# Assemble file args: meta + diff + excerpts + content files (excluding those with excerpts to avoid duplicate bloat)
 FINAL_FILES=("$META_FILE" "$DIFF_FILE")
 if [[ ${#EXCERPT_FILES[@]} -gt 0 ]]; then
   for ex in "${EXCERPT_FILES[@]}"; do FINAL_FILES+=("$ex"); done
 fi
-if [[ ${#INCLUDE_FILES[@]} -gt 0 ]]; then
-  for f in "${INCLUDE_FILES[@]}"; do FINAL_FILES+=("$f"); done
+
+# remove original large files if excerpt exists (avoid huge packs)
+if [[ "${#EXCERPT_FILES[@]}" -gt 0 ]]; then
+  if [[ ${#INCLUDE_FILES[@]} -gt 0 ]]; then
+    for f in "${INCLUDE_FILES[@]}"; do
+      size="$("$PYTHON_BIN" - "$f" <<'PY'
+import os,sys
+print(os.path.getsize(sys.argv[1]))
+PY
+    )"
+      if [[ "$size" -le "$MAX_BYTES" ]]; then
+        FINAL_FILES+=("$f")
+      fi
+    done
+  fi
+else
+  if [[ ${#INCLUDE_FILES[@]} -gt 0 ]]; then
+    for f in "${INCLUDE_FILES[@]}"; do FINAL_FILES+=("$f"); done
+  fi
 fi
 
 echo "Generating oracle pack → $OUT_FILE"
