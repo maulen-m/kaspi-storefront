@@ -1,4 +1,4 @@
-# Deploy (Cloudflare Pages)
+# Deploy (Cloudflare Pages, Cloudflare-native)
 
 ## Build & preview
 
@@ -12,9 +12,8 @@
 - Build output directory: `dist`
 - Node version: `20.x`
 
-> Note: current adapter is `@astrojs/node` for local/server output.
-> If you want native Cloudflare runtime, switch to the Cloudflare adapter and replace
-> filesystem logging in `/go/kaspi/[slug]` with a CF-friendly target (KV, Logs, etc.).
+Adapter: `@astrojs/cloudflare` (hybrid).  
+Only on-demand routes run as SSR; everything else is pre-rendered.
 
 ## Environment variables (set in CF Pages)
 
@@ -23,13 +22,27 @@
 - `PUBLIC_SUPPORT_PHONE`
 - `PUBLIC_WHATSAPP_NUMBER`
 - `PUBLIC_KASPI_STORE_URL`
-- `KASPI_STORE_URL`
-- `CLICK_LOG_PATH` (optional; file path only for Node hosting)
 - `PUBLIC_GA_ID` (optional)
 - `PUBLIC_META_PIXEL_ID` (optional)
 - `PUBLIC_TIKTOK_PIXEL_ID` (optional)
 - `PUBLIC_ANALYTICS_REQUIRE_CONSENT` (optional, "1" to require consent)
 - `PUBLIC_ANALYTICS_CONSENT_COOKIE` (optional; default `of_consent`)
+
+## Workers Analytics Engine (WAE)
+
+Bind dataset:
+
+- Binding: `CLICKLOG`
+- Dataset: `acmewear_clicks`
+
+This is used by `/go/kaspi/[slug]` to log click-outs.
+
+## Wrangler (optional local preview)
+
+```
+pnpm build
+wrangler pages dev dist
+```
 
 ## Domain + SSL
 

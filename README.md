@@ -1,74 +1,62 @@
-# ACMEWEAR Website (Static, Hostinger-friendly)
+# ACMEWEAR Web (Kaspi-first bridge)
 
-This is a premium minimal storefront template for **ACMEWEAR** (sportswear brand, Kazakhstan).
-It is designed to look like a legitimate operating business website for **Meta / WhatsApp API verification**.
+Premium, minimal, mobile-first storefront for **ACMEWEAR** (Kazakhstan).  
+Primary job: IG/TikTok traffic → ACMEWEAR site → measured click-out → Kaspi.
 
-## Quick deploy (Hostinger)
+## Quick start
 
-1. Download and unzip the site.
-2. In Hostinger **File Manager**, open `public_html/`
-3. Upload all files/folders from this project into `public_html/`
-4. Make sure `index.html` sits directly inside `public_html/`
-5. Enable SSL (HTTPS) in Hostinger panel.
+```
+pnpm install
+pnpm dev
+```
 
-## Edit the most important placeholders (do this before verification)
+Key commands:
 
-Search/replace these across HTML files:
+- `pnpm verify` (lint + format + typecheck + test + build)
+- `pnpm test:e2e` (Playwright)
+- `pnpm lhci` (Lighthouse CI)
+- `pnpm preview` (prod-like)
 
-- `support@acmewear.kz` → your real domain mailbox
-- `+7 (7XX) XXX-XX-XX` → your real phone
-- `Almaty, Kazakhstan (replace)` → your real address or legal address
-- Instagram/TikTok placeholder links
+## Product data
 
-**Keep your domain and email aligned**:
+- Products: `src/data/products.json`
+- Images: `public/assets/img/` (placeholder images stay placeholder)
 
-- Website: `https://acmewear.kz`
-- Email: `support@acmewear.kz`
+## Campaign landers (M8)
 
-## Update products (easy)
+Marketing can ship landers by editing config:
 
-Edit:
+- `src/content/landers/*.json`
+- Routes: `/l/[campaign]`
 
-- `assets/data/products.js`
+## Kaspi click logging
 
-Each product has:
+All Kaspi CTAs route through:
 
-- `sku`, `name`, `category`, `price_kzt`, `short_description`
-- `sizes`, `colors`
-- `images` (paths like `assets/img/product-1.jpg`)
+- `/go/kaspi/[slug]` → Workers Analytics Engine (WAE) → 302 to Kaspi
 
-## Replace images
+## Pages
 
-Current placeholders:
+- `/` (home)
+- `/shop`
+- `/p/[slug]`
+- `/contact`
+- `/size-guide`
+- `/delivery-returns`
+- `/faq`
+- `/policies/*`
 
-- `assets/img/placeholder.svg`
-- `assets/img/og-image.svg`
+## Environment variables (Cloudflare Pages)
 
-To add real images:
+- `PUBLIC_SITE_DOMAIN`
+- `PUBLIC_SUPPORT_EMAIL`
+- `PUBLIC_SUPPORT_PHONE`
+- `PUBLIC_WHATSAPP_NUMBER`
+- `PUBLIC_KASPI_STORE_URL`
+- `PUBLIC_GA_ID`, `PUBLIC_META_PIXEL_ID`, `PUBLIC_TIKTOK_PIXEL_ID` (optional)
+- `PUBLIC_ANALYTICS_REQUIRE_CONSENT` (optional)
+- `PUBLIC_ANALYTICS_CONSENT_COOKIE` (optional)
 
-1. Put images into `assets/img/`
-2. Update each product’s `images` array in `assets/data/products.js`
+## Deploy
 
-## Cart and checkout
-
-- Cart works via `localStorage` (frontend-only).
-- Checkout is UI-only (no payments). It encourages ordering via WhatsApp/email for now.
-
-## Files
-
-- `assets/css/styles.css` → site styles (premium minimal)
-- `assets/js/main.js` → cart drawer + cart storage + home product rendering
-- `assets/js/shop.js` → shop filters + product grid
-- `assets/js/product.js` → product page rendering
-- `assets/js/cart.js` → cart page rendering
-- `assets/js/checkout.js` → checkout placeholder rendering
-- `policies/*.html` → trust pages (privacy/terms/shipping/payment/faq)
-
-## Domain note
-
-This template uses `https://acmewear.kz` in `sitemap.xml`, `robots.txt`, and canonical tags.
-After you buy your final domain, update:
-
-- `robots.txt`
-- `sitemap.xml`
-- canonical URLs inside `<head>` tags (optional but recommended)
+See `docs/DEPLOY.md` for Cloudflare Pages + Wrangler details.

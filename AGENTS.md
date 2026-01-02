@@ -23,7 +23,7 @@ There is NO on-site checkout in v1. The site’s job is:
 
 - Astro (static-first) + TypeScript
 - Hosting: Cloudflare Pages
-- Redirect + click logging: `/go/...` via Cloudflare Worker/Pages Functions
+- Redirect + click logging: `/go/...` via Cloudflare Pages Functions + WAE
 - RU-first content; KZ later must be easy (no deep hardcoded strings)
 
 ---
@@ -50,12 +50,29 @@ There is NO on-site checkout in v1. The site’s job is:
 - `pnpm lint`
 - `pnpm build`
 - `pnpm verify` (preferred umbrella gate if available)
+- `pnpm test:e2e` and `pnpm lhci` when requested
 
 If CI exists, run the same gate locally before commit.
 
 ---
 
-## 4) Codex autonomy envelope (web repo)
+## 4) Cloudflare runtime notes
+
+- Hybrid output: most pages are pre-rendered; SSR only for required routes.
+- WAE binding: `CLICKLOG` dataset `acmewear_clicks`.
+- Access bindings in API routes via `context.locals.runtime.env`.
+- Do not log raw IP or full user-agent.
+
+---
+
+## 5) Secrets policy
+
+- No `.env` files committed.
+- Only PUBLIC_* vars in docs; secrets live in Cloudflare dashboard.
+
+---
+
+## 6) Codex autonomy envelope (web repo)
 
 Allowed without asking:
 
@@ -71,7 +88,7 @@ Must HALT + ask if:
 
 ---
 
-## 5) Oracle packs (how we do reviews)
+## 7) Oracle packs (how we do reviews)
 
 Default: changed-files-only pack (range based).
 Pack should include:
