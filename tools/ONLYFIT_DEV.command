@@ -5,14 +5,4 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$REPO_ROOT"
 
-# Use pnpm if available; otherwise try corepack
-if ! command -v pnpm >/dev/null 2>&1; then
-  corepack enable || true
-fi
-
-# Fast path install
-if [ ! -d node_modules ]; then
-  pnpm install
-fi
-
-pnpm dev
+"$REPO_ROOT/scripts/dev.sh"
