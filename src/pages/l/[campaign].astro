@@ -1,0 +1,128 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProductCard from "../../components/ProductCard.astro";
+import { getProductBySlug } from "../../lib/products";
+
+const landers = await getCollection("landers");
+
+export async function getStaticPaths() {
+  return landers.map((entry) => ({
+    params: { campaign: entry.id },
+  }));
+}
+
+const { campaign } = Astro.params;
+const entry = landers.find((item) => item.id === campaign);
+
+if (!entry) {
+  return Astro.redirect("/shop");
+}
+
+const lander = entry.data;
+const utmParams = new URLSearchParams();
+if (lander.utm) {
+  Object.entries(lander.utm).forEach(([key, value]) => {
+    if (value) utmParams.set(key, value);
+  });
+}
+
+const buildKaspiHref = (slug: string) => {
+  const qs = utmParams.toString();
+  return qs ? `/go/kaspi/${slug}?${qs}` : `/go/kaspi/${slug}`;
+};
+
+const featured = (lander.featured_products ?? [])
+  .map((slug) => getProductBySlug(slug))
+  .filter(Boolean);
+
+const analytics =
+  featured.length > 0
+    ? {
+        page_type: "view_item_list",
+        item_list_id: `lander:${campaign}`,
+        item_list_name: lander.headline,
+        items: featured.map((product) => ({
+          item_id: product?.id,
+          item_name: product?.title_ru,
+          item_category: product?.category,
+          item_slug: product?.slug,
+          price: product?.price_kzt ?? undefined,
+        })),
+      }
+    : null;
+---
+
+<BaseLayout title={lander.title} description={lander.description ?? ""} analytics={analytics}>
+  <div class="container">
+    <section class="hero">
+      <div class="hero__copy">
+        <div class="kicker">
+          <span class="dot"></span>
+          {lander.kicker ?? "ACMEWEAR"}
+        </div>
+        <h1>{lander.headline}</h1>
+        {lander.subhead ? <p>{lander.subhead}</p> : null}
+        <div class="hero__cta">
+          <a
+            class="btn btn--primary"
+            href={buildKaspiHref(lander.primary_cta.kaspi_slug)}
+            data-of-placement={`lander_${campaign}_primary`}
+          >
+            {lander.primary_cta.label}
+          </a>
+          {lander.secondary_cta ? (
+            <a
+              class="btn btn--ghost"
+              href={lander.secondary_cta.href}
+              data-of-placement={`lander_${campaign}_secondary`}
+            >
+              {lander.secondary_cta.label}
+            </a>
+          ) : null}
+        </div>
+      </div>
+      <div class="hero__media">
+        <img src="/assets/img/placeholder.svg" alt={lander.headline} loading="lazy" />
+      </div>
+    </section>
+
+    {lander.highlights?.length ? (
+      <section class="section">
+        <div class="section__head">
+          <div>
+            <h2 class="section__title">Почему ACMEWEAR</h2>
+            <p class="section__sub">Ключевые причины выбрать ACMEWEAR.</p>
+          </div>
+        </div>
+        <div class="grid">
+          {lander.highlights.map((item) => (
+            <article class="card" style="grid-column: span 4;">
+              <div class="card__pad">
+                <h3 class="card__title">{item.title}</h3>
+                <p class="card__text">{item.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+    ) : null}
+
+    {featured.length ? (
+      <section class="section">
+        <div class="section__head">
+          <div>
+            <h2 class="section__title">Подборка</h2>
+            <p class="section__sub">Выбранные позиции для этой кампании.</p>
+          </div>
+          <a class="btn btn--ghost" href="/shop" data-of-placement={`lander_${campaign}_shop`}>
+            Все товары
+          </a>
+        </div>
+        <div class="product-grid">
+          {featured.map((product) => (product ? <ProductCard product={product} /> : null))}
+        </div>
+      </section>
+    ) : null}
+  </div>
+</BaseLayout>

@@ -1,4 +1,4 @@
-import products from "../content/products.json";
+import products from "../data/products.json";
 
 export type Product = {
   id: string;

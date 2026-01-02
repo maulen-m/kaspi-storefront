@@ -1,0 +1,39 @@
+{
+  "title": "ACMEWEAR — Запуск коллекции",
+  "description": "Официальный запуск ACMEWEAR: минимализм и Kaspi-first покупки.",
+  "kicker": "Launch / ACMEWEAR",
+  "headline": "Стартовая коллекция без компромиссов.",
+  "subhead": "Минималистичный крой, чистые линии, доставка по Казахстану. Покупка — через Kaspi.",
+  "primary_cta": {
+    "label": "Купить в Kaspi",
+    "kaspi_slug": "store"
+  },
+  "secondary_cta": {
+    "label": "Смотреть каталог",
+    "href": "/shop"
+  },
+  "highlights": [
+    {
+      "title": "Kaspi-first",
+      "text": "Открываем товар в Kaspi без лишних шагов."
+    },
+    {
+      "title": "Минимализм",
+      "text": "Чистая типографика и строгие линии."
+    },
+    {
+      "title": "КЗ-операции",
+      "text": "Коммуникация, доставка и сервис в Казахстане."
+    }
+  ],
+  "featured_products": [
+    "performance-training-tee",
+    "core-compression-leggings",
+    "sculpt-set"
+  ],
+  "utm": {
+    "utm_source": "instagram",
+    "utm_medium": "paid_social",
+    "utm_campaign": "launch_2026"
+  }
+}
