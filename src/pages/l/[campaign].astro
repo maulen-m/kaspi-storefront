@@ -4,14 +4,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import { getProductBySlug } from "../../lib/products";
 
-const landers = await getCollection("landers");
-
 export async function getStaticPaths() {
+  const landers = await getCollection("landers");
   return landers.map((entry) => ({
     params: { campaign: entry.id },
   }));
 }
 
+const landers = await getCollection("landers");
 const { campaign } = Astro.params;
 const entry = landers.find((item) => item.id === campaign);
 
