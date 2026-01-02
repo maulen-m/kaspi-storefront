@@ -5,13 +5,9 @@ import { resolveKaspiUrl } from "../../../lib/kaspi";
 export const prerender = false;
 
 const createClickId = () => {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
-  }
-  if (typeof crypto !== "undefined" && "getRandomValues" in crypto) {
-    const bytes = new Uint8Array(16);
-    crypto.getRandomValues(bytes);
-    return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  const cryptoObj = globalThis.crypto as { randomUUID?: () => string } | undefined;
+  if (cryptoObj?.randomUUID) {
+    return cryptoObj.randomUUID();
   }
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 };
