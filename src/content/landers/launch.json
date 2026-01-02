@@ -26,11 +26,7 @@
       "text": "Коммуникация, доставка и сервис в Казахстане."
     }
   ],
-  "featured_products": [
-    "performance-training-tee",
-    "core-compression-leggings",
-    "sculpt-set"
-  ],
+  "featured_products": ["performance-training-tee", "core-compression-leggings", "sculpt-set"],
   "utm": {
     "utm_source": "instagram",
     "utm_medium": "paid_social",

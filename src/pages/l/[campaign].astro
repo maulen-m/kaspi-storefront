@@ -71,15 +71,17 @@ const analytics =
           >
             {lander.primary_cta.label}
           </a>
-          {lander.secondary_cta ? (
-            <a
-              class="btn btn--ghost"
-              href={lander.secondary_cta.href}
-              data-of-placement={`lander_${campaign}_secondary`}
-            >
-              {lander.secondary_cta.label}
-            </a>
-          ) : null}
+          {
+            lander.secondary_cta ? (
+              <a
+                class="btn btn--ghost"
+                href={lander.secondary_cta.href}
+                data-of-placement={`lander_${campaign}_secondary`}
+              >
+                {lander.secondary_cta.label}
+              </a>
+            ) : null
+          }
         </div>
       </div>
       <div class="hero__media">
@@ -87,42 +89,46 @@ const analytics =
       </div>
     </section>
 
-    {lander.highlights?.length ? (
-      <section class="section">
-        <div class="section__head">
-          <div>
-            <h2 class="section__title">Почему ACMEWEAR</h2>
-            <p class="section__sub">Ключевые причины выбрать ACMEWEAR.</p>
+    {
+      lander.highlights?.length ? (
+        <section class="section">
+          <div class="section__head">
+            <div>
+              <h2 class="section__title">Почему ACMEWEAR</h2>
+              <p class="section__sub">Ключевые причины выбрать ACMEWEAR.</p>
+            </div>
           </div>
-        </div>
-        <div class="grid">
-          {lander.highlights.map((item) => (
-            <article class="card" style="grid-column: span 4;">
-              <div class="card__pad">
-                <h3 class="card__title">{item.title}</h3>
-                <p class="card__text">{item.text}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-    ) : null}
+          <div class="grid">
+            {lander.highlights.map((item) => (
+              <article class="card" style="grid-column: span 4;">
+                <div class="card__pad">
+                  <h3 class="card__title">{item.title}</h3>
+                  <p class="card__text">{item.text}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null
+    }
 
-    {featured.length ? (
-      <section class="section">
-        <div class="section__head">
-          <div>
-            <h2 class="section__title">Подборка</h2>
-            <p class="section__sub">Выбранные позиции для этой кампании.</p>
+    {
+      featured.length ? (
+        <section class="section">
+          <div class="section__head">
+            <div>
+              <h2 class="section__title">Подборка</h2>
+              <p class="section__sub">Выбранные позиции для этой кампании.</p>
+            </div>
+            <a class="btn btn--ghost" href="/shop" data-of-placement={`lander_${campaign}_shop`}>
+              Все товары
+            </a>
           </div>
-          <a class="btn btn--ghost" href="/shop" data-of-placement={`lander_${campaign}_shop`}>
-            Все товары
-          </a>
-        </div>
-        <div class="product-grid">
-          {featured.map((product) => (product ? <ProductCard product={product} /> : null))}
-        </div>
-      </section>
-    ) : null}
+          <div class="product-grid">
+            {featured.map((product) => (product ? <ProductCard product={product} /> : null))}
+          </div>
+        </section>
+      ) : null
+    }
   </div>
 </BaseLayout>
