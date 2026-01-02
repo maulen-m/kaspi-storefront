@@ -68,7 +68,7 @@ If CI exists, run the same gate locally before commit.
 ## 5) Secrets policy
 
 - No `.env` files committed.
-- Only PUBLIC_* vars in docs; secrets live in Cloudflare dashboard.
+- Only PUBLIC\_\* vars in docs; secrets live in Cloudflare dashboard.
 
 ---
 
