@@ -1,7 +1,10 @@
-import { defineConfig } from "astro/config";
-import node from "@astrojs/node";
+import { defineConfig, passthroughImageService } from "astro/config";
+import cloudflare from "@astrojs/cloudflare";
 
 export default defineConfig({
-  output: "server",
-  adapter: node({ mode: "standalone" }),
+  output: "hybrid",
+  adapter: cloudflare({ mode: "directory" }),
+  image: {
+    service: passthroughImageService(),
+  },
 });
