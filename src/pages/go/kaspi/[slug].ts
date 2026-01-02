@@ -1,32 +1,81 @@
 import type { APIRoute } from "astro";
-import crypto from "node:crypto";
-import { buildAttributionSnapshot, logClickOut } from "../../../lib/attribution";
+import { buildAttributionSnapshot } from "../../../lib/attribution";
 import { resolveKaspiUrl } from "../../../lib/kaspi";
 
+export const prerender = false;
+
 const createClickId = () => {
-  if (typeof crypto.randomUUID === "function") {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return crypto.randomUUID();
   }
-  return crypto.randomBytes(16).toString("hex");
+  if (typeof crypto !== "undefined" && "getRandomValues" in crypto) {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 };
 
-export const GET: APIRoute = async ({ params, request }) => {
+const getDeviceClass = (userAgent: string) => {
+  const ua = userAgent.toLowerCase();
+  if (!ua) return "unknown";
+  if (ua.includes("tablet") || ua.includes("ipad")) return "tablet";
+  if (ua.includes("mobi") || ua.includes("android")) return "mobile";
+  return "desktop";
+};
+
+export const GET: APIRoute = async ({ params, request, locals }) => {
   const slug = params.slug ?? "";
   const targetUrl = resolveKaspiUrl(slug);
 
   const attribution = buildAttributionSnapshot(request);
   const ofCid = attribution.of_cid ?? createClickId();
+  const deviceClass = getDeviceClass(attribution.user_agent ?? "");
 
-  const payload = {
-    type: "kaspi_click",
+  const { user_agent, ip, ...safe } = attribution;
+  const blobs = [
+    "kaspi_click",
     slug,
-    target_url: targetUrl,
-    of_cid: ofCid,
-    ts: new Date().toISOString(),
-    ...attribution,
-  };
+    safe.utm_campaign ?? "",
+    safe.utm_source ?? "",
+    safe.utm_medium ?? "",
+    safe.utm_content ?? "",
+    safe.utm_term ?? "",
+    safe.fbclid ?? "",
+    safe.ttclid ?? "",
+    safe.gclid ?? "",
+    safe.landing_url ?? "",
+    safe.referrer ?? "",
+    deviceClass,
+  ];
 
-  await logClickOut(payload);
+  const env = (locals as { runtime?: { env?: Record<string, unknown> } })?.runtime?.env ?? {};
+  const clicklog = env.CLICKLOG as { writeDataPoint?: (point: unknown) => void } | undefined;
+
+  if (clicklog?.writeDataPoint) {
+    try {
+      clicklog.writeDataPoint({
+        blobs,
+        doubles: [1],
+        indexes: [ofCid],
+      });
+    } catch {
+      // avoid breaking redirect on logging failure
+    }
+  } else {
+    console.info(
+      "[kaspi]",
+      JSON.stringify({
+        type: "kaspi_click",
+        slug,
+        target_url: targetUrl,
+        of_cid: ofCid,
+        device_class: deviceClass,
+        ...safe,
+        ts: new Date().toISOString(),
+      })
+    );
+  }
 
   return new Response(null, {
     status: 302,

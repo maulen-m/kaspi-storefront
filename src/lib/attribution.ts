@@ -1,6 +1,3 @@
-import fs from "node:fs/promises";
-import path from "node:path";
-
 const ATTR_KEYS = [
   "utm_source",
   "utm_medium",
@@ -42,12 +39,25 @@ const parseCookies = (cookieHeader: string | null) => {
 const readUtmCookie = (request: Request) => {
   const cookies = parseCookies(request.headers.get("cookie"));
   const raw = cookies.of_utm;
-  if (!raw) return {};
+  const data: Record<string, string> = {};
+  if (!raw) {
+    if (cookies.of_cid) {
+      data.of_cid = decodeURIComponent(cookies.of_cid);
+    }
+    return data;
+  }
   try {
     const decoded = decodeURIComponent(raw);
-    return JSON.parse(decoded) as Record<string, string>;
+    const parsed = JSON.parse(decoded) as Record<string, string>;
+    if (cookies.of_cid && !parsed.of_cid) {
+      parsed.of_cid = decodeURIComponent(cookies.of_cid);
+    }
+    return parsed;
   } catch {
-    return {};
+    if (cookies.of_cid) {
+      data.of_cid = decodeURIComponent(cookies.of_cid);
+    }
+    return data;
   }
 };
 
@@ -72,17 +82,4 @@ export const buildAttributionSnapshot = (request: Request): AttributionSnapshot 
     "";
 
   return merged;
-};
-
-export const logClickOut = async (payload: Record<string, unknown>) => {
-  const logPath = process.env.CLICK_LOG_PATH;
-  const line = JSON.stringify(payload) + "\n";
-
-  if (!logPath) {
-    console.info("[kaspi]", line.trim());
-    return;
-  }
-
-  await fs.mkdir(path.dirname(logPath), { recursive: true });
-  await fs.appendFile(logPath, line, "utf8");
 };
