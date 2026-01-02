@@ -13,4 +13,4 @@ if [ ! -d node_modules ]; then
 fi
 
 pnpm build
-pnpm preview
+npx wrangler pages dev dist --local --port 4321
