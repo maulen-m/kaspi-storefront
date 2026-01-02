@@ -32,7 +32,9 @@ export const GET: APIRoute = async ({ params, request, locals }) => {
   const ofCid = attribution.of_cid ?? createClickId();
   const deviceClass = getDeviceClass(attribution.user_agent ?? "");
 
-  const { user_agent, ip, ...safe } = attribution;
+  const safe = { ...attribution };
+  delete safe.user_agent;
+  delete safe.ip;
   const blobs = [
     "kaspi_click",
     slug,
