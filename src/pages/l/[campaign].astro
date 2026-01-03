@@ -1,8 +1,9 @@
 ---
 import { getCollection } from "astro:content";
 import LandingLayout from "../../layouts/LandingLayout.astro";
-import ProductCard from "../../components/ProductCard.astro";
+import CountdownFlip from "../../components/CountdownFlip.astro";
 import { getProductBySlug } from "../../lib/products";
+import { formatKZT } from "../../lib/format";
 
 export async function getStaticPaths() {
   const landers = await getCollection("landers");
@@ -34,7 +35,30 @@ const buildKaspiHref = (slug: string) => {
 
 const featured = (lander.featured_products ?? [])
   .map((slug) => getProductBySlug(slug))
-  .filter(Boolean);
+  .filter((item): item is NonNullable<ReturnType<typeof getProductBySlug>> => Boolean(item));
+const heroProduct = getProductBySlug(lander.hero_product_slug);
+const heroImage = lander.hero_image || heroProduct?.images?.[0] || "/assets/img/placeholder.svg";
+const bulletItems =
+  (heroProduct?.bullets_ru?.length
+    ? heroProduct.bullets_ru
+    : lander.highlights?.map((item) => item.title)
+  )?.slice(0, 3) ?? [];
+const ctaSlug = lander.hero_product_slug || lander.primary_cta.kaspi_slug;
+const included = featured.slice(0, 3);
+const faqItems = [
+  {
+    q: "Как купить?",
+    a: "Нажмите кнопку «Купить в Kaspi» и оформите заказ в приложении Kaspi.",
+  },
+  {
+    q: "Доставка по Казахстану?",
+    a: "Оформление и доставка проходят через Kaspi, статус доступен в приложении.",
+  },
+  {
+    q: "Как связаться с поддержкой?",
+    a: "Свяжитесь с нами через WhatsApp или по телефону — контакты в шапке.",
+  },
+];
 
 const analytics =
   featured.length > 0
@@ -55,55 +79,95 @@ const analytics =
 
 <LandingLayout title={lander.title} description={lander.description ?? ""} analytics={analytics}>
   <div class="container">
-    <section class="hero">
-      <div class="hero__copy">
+    <section class="cpa-hero">
+      <div class="cpa-hero__media">
+        <img
+          src={heroImage}
+          alt={heroProduct?.title_ru ?? lander.headline}
+          width="720"
+          height="720"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+        />
+        {
+          lander.inventory_left ? (
+            <div class="cpa-hero__badge">Осталось {lander.inventory_left} шт.</div>
+          ) : null
+        }
+      </div>
+      <div class="cpa-hero__content">
         <div class="kicker">
           <span class="dot"></span>
           {lander.kicker ?? "ACMEWEAR"}
         </div>
         <h1>{lander.headline}</h1>
-        {lander.subhead ? <p>{lander.subhead}</p> : null}
-        <div class="hero__cta">
+        {lander.subhead ? <p class="cpa-hero__subhead">{lander.subhead}</p> : null}
+        {
+          heroProduct?.price_kzt ? (
+            <div class="cpa-hero__price">Цена в Kaspi: {formatKZT(heroProduct.price_kzt)}</div>
+          ) : null
+        }
+        {
+          bulletItems.length ? (
+            <ul class="cpa-hero__bullets">
+              {bulletItems.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          ) : null
+        }
+        <div class="cpa-hero__cta">
           <a
             class="btn btn--primary"
-            href={buildKaspiHref(lander.primary_cta.kaspi_slug)}
+            href={buildKaspiHref(ctaSlug)}
             data-of-placement={`lander_${campaign}_primary`}
           >
             {lander.primary_cta.label}
           </a>
+        </div>
+        <div class="cpa-hero__meta">
+          <p class="cpa-hero__scarcity">{lander.scarcity_text}</p>
           {
-            lander.secondary_cta ? (
-              <a
-                class="btn btn--ghost"
-                href={lander.secondary_cta.href}
-                data-of-placement={`lander_${campaign}_secondary`}
-              >
-                {lander.secondary_cta.label}
-              </a>
+            lander.inventory_left ? (
+              <p class="cpa-hero__inventory">Осталось {lander.inventory_left} шт.</p>
             ) : null
           }
+          <CountdownFlip
+            mode={lander.countdown_mode}
+            endIso={lander.countdown_end_iso}
+            hours={lander.countdown_hours}
+            storageKey={`of_countdown_${campaign}`}
+            label="До конца акции"
+          />
         </div>
-      </div>
-      <div class="hero__media">
-        <img src="/assets/img/placeholder.svg" alt={lander.headline} loading="lazy" />
       </div>
     </section>
 
     {
-      lander.highlights?.length ? (
+      included.length ? (
         <section class="section">
           <div class="section__head">
             <div>
-              <h2 class="section__title">Почему ACMEWEAR</h2>
-              <p class="section__sub">Ключевые причины выбрать ACMEWEAR.</p>
+              <h2 class="section__title">Что входит</h2>
+              <p class="section__sub">Ключевые позиции из комплекта запуска.</p>
             </div>
           </div>
-          <div class="grid">
-            {lander.highlights.map((item) => (
-              <article class="card" style="grid-column: span 4;">
+          <div class="grid cpa-includes">
+            {included.map((product) => (
+              <article class="card cpa-includes__item">
+                <div class="card__media">
+                  <img
+                    src={product.images?.[0] ?? "/assets/img/placeholder.svg"}
+                    alt={product.title_ru}
+                    loading="lazy"
+                  />
+                </div>
                 <div class="card__pad">
-                  <h3 class="card__title">{item.title}</h3>
-                  <p class="card__text">{item.text}</p>
+                  <h3 class="card__title">{product.title_ru}</h3>
+                  {product.bullets_ru?.[0] ? (
+                    <p class="card__text">{product.bullets_ru[0]}</p>
+                  ) : null}
                 </div>
               </article>
             ))}
@@ -112,23 +176,25 @@ const analytics =
       ) : null
     }
 
-    {
-      featured.length ? (
-        <section class="section">
-          <div class="section__head">
-            <div>
-              <h2 class="section__title">Подборка</h2>
-              <p class="section__sub">Выбранные позиции для этой кампании.</p>
-            </div>
-            <a class="btn btn--ghost" href="/shop" data-of-placement={`lander_${campaign}_shop`}>
-              Все товары
-            </a>
-          </div>
-          <div class="product-grid">
-            {featured.map((product) => (product ? <ProductCard product={product} /> : null))}
-          </div>
-        </section>
-      ) : null
-    }
+    <section class="section">
+      <div class="section__head">
+        <div>
+          <h2 class="section__title">FAQ</h2>
+          <p class="section__sub">Быстрые ответы перед покупкой.</p>
+        </div>
+      </div>
+      <div class="faq">
+        {
+          faqItems.map((item) => (
+            <details class="faq__item">
+              <summary class="faq__summary">{item.q}</summary>
+              <div class="faq__content">
+                <p>{item.a}</p>
+              </div>
+            </details>
+          ))
+        }
+      </div>
+    </section>
   </div>
 </LandingLayout>
