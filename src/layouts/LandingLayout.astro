@@ -1,0 +1,460 @@
+---
+import { siteConfig, getPhoneLink, getWhatsappLink } from "../lib/site";
+
+const {
+  title = "ACMEWEAR",
+  description = "Премиальная спортивная одежда в Казахстане.",
+  ogImage = "/assets/img/og-image.svg",
+  canonical,
+  analytics,
+  showContactActions = true,
+} = Astro.props;
+
+const pathname = Astro.url.pathname;
+const canonicalUrl = canonical ?? `${siteConfig.domain}${pathname}`;
+const year = new Date().getFullYear();
+
+const analyticsConfig = {
+  gaId: import.meta.env.PUBLIC_GA_ID ?? "",
+  metaPixelId: import.meta.env.PUBLIC_META_PIXEL_ID ?? "",
+  tiktokPixelId: import.meta.env.PUBLIC_TIKTOK_PIXEL_ID ?? "",
+  consentCookie: import.meta.env.PUBLIC_ANALYTICS_CONSENT_COOKIE ?? "of_consent",
+  requireConsent: import.meta.env.PUBLIC_ANALYTICS_REQUIRE_CONSENT === "1",
+};
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:site_name" content={siteConfig.brand} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={`${siteConfig.domain}${ogImage}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link
+      rel="preload"
+      href="/assets/fonts/Inter-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/assets/fonts/Inter-700.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link rel="stylesheet" href="/assets/css/fonts.css" />
+    <link rel="stylesheet" href="/assets/css/styles.css" />
+    <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="landing">
+    <header class="header header--landing">
+      <div class="container header__bar">
+        <a class="brand" href="/" aria-label="ACMEWEAR home">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__name">ACMEWEAR</span>
+        </a>
+
+        {
+          showContactActions ? (
+            <div class="header__actions">
+              <a
+                class="btn btn--ghost"
+                href={getWhatsappLink()}
+                target="_blank"
+                rel="noopener"
+                data-of-placement="header_whatsapp"
+              >
+                WhatsApp
+              </a>
+              <a class="btn btn--ghost" href={getPhoneLink()} data-of-placement="header_call">
+                Позвонить
+              </a>
+            </div>
+          ) : null
+        }
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer footer--minimal">
+      <div class="container footer__mini">
+        <div class="footer__mini-brand">{siteConfig.brand}</div>
+        <nav class="footer__mini-links" aria-label="Trust">
+          <a href="/contact">Контакты</a>
+          <a href="/policies/privacy">Политика</a>
+          <a href="/policies/terms">Условия</a>
+        </nav>
+      </div>
+      <div class="container footer__bottom footer__bottom--minimal">
+        <div>© {year} ACMEWEAR. Все права защищены.</div>
+        <div>Kaspi-first запуск.</div>
+      </div>
+    </footer>
+
+    <script is:inline>
+      (function () {
+        var keys = [
+          "utm_source",
+          "utm_medium",
+          "utm_campaign",
+          "utm_content",
+          "utm_term",
+          "fbclid",
+          "ttclid",
+          "gclid",
+        ];
+        var params = new URLSearchParams(window.location.search);
+        var stored = {};
+        try {
+          stored = JSON.parse(localStorage.getItem("of_utm") || "{}") || {};
+        } catch (e) {
+          stored = {};
+        }
+        var updated = false;
+        keys.forEach(function (key) {
+          if (params.has(key)) {
+            stored[key] = params.get(key) || "";
+            updated = true;
+          }
+        });
+
+        var ofCid = stored.of_cid || localStorage.getItem("of_cid");
+        if (!ofCid) {
+          if (window.crypto && window.crypto.randomUUID) {
+            ofCid = window.crypto.randomUUID();
+          } else {
+            ofCid = String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+          }
+          updated = true;
+        }
+        stored.of_cid = ofCid;
+        stored.landing_url = stored.landing_url || window.location.href;
+        stored.referrer = stored.referrer || document.referrer || "";
+
+        if (updated) {
+          localStorage.setItem("of_utm", JSON.stringify(stored));
+          localStorage.setItem("of_cid", ofCid);
+        }
+
+        var cookieValue = encodeURIComponent(JSON.stringify(stored));
+        document.cookie =
+          "of_utm=" + cookieValue + "; Path=/; Max-Age=" + 60 * 60 * 24 * 30 + "; SameSite=Lax";
+        document.cookie =
+          "of_cid=" +
+          encodeURIComponent(ofCid) +
+          "; Path=/; Max-Age=" +
+          60 * 60 * 24 * 30 +
+          "; SameSite=Lax";
+
+        var links = document.querySelectorAll('a[href^="/go/kaspi/"]');
+        links.forEach(function (link) {
+          var url = new URL(link.getAttribute("href"), window.location.origin);
+          if (!url.searchParams.get("of_cid")) {
+            url.searchParams.set("of_cid", ofCid);
+          }
+          keys.forEach(function (key) {
+            if (stored[key] && !url.searchParams.get(key)) {
+              url.searchParams.set(key, stored[key]);
+            }
+          });
+          link.setAttribute("href", url.pathname + url.search);
+        });
+      })();
+    </script>
+    <script
+      type="application/json"
+      id="of-analytics-config"
+      set:html={JSON.stringify(analyticsConfig)}
+    />
+    {
+      analytics ? (
+        <script type="application/json" id="of-analytics" set:html={JSON.stringify(analytics)} />
+      ) : null
+    }
+    <script is:inline>
+      (function () {
+        var config = {};
+        var configNode = document.getElementById("of-analytics-config");
+        if (configNode) {
+          try {
+            config = JSON.parse(configNode.textContent || "{}");
+          } catch (e) {
+            config = {};
+          }
+        }
+        var hasIds = Boolean(config.gaId || config.metaPixelId || config.tiktokPixelId);
+        var consentCookie = config.consentCookie || "of_consent";
+        var requireConsent = Boolean(config.requireConsent);
+
+        function hasConsent() {
+          if (!requireConsent) return true;
+          return document.cookie.indexOf(consentCookie + "=1") !== -1;
+        }
+
+        if (!hasIds || !hasConsent()) return;
+
+        var queue = [];
+        var sent = {};
+
+        function readStored() {
+          var stored = {};
+          try {
+            stored = JSON.parse(localStorage.getItem("of_utm") || "{}") || {};
+          } catch (e) {
+            stored = {};
+          }
+          return stored;
+        }
+
+        function buildPayload(extra) {
+          var stored = readStored();
+          var payload = Object.assign(
+            {
+              of_cid: stored.of_cid || localStorage.getItem("of_cid") || "",
+              utm_source: stored.utm_source || "",
+              utm_medium: stored.utm_medium || "",
+              utm_campaign: stored.utm_campaign || "",
+              utm_content: stored.utm_content || "",
+              utm_term: stored.utm_term || "",
+              fbclid: stored.fbclid || "",
+              ttclid: stored.ttclid || "",
+              gclid: stored.gclid || "",
+            },
+            extra || {}
+          );
+          return payload;
+        }
+
+        function sendEvent(name, params) {
+          var payload = buildPayload(params);
+          if (window.gtag) {
+            window.gtag("event", name, payload);
+          } else {
+            queue.push([name, payload]);
+          }
+          if (window.fbq) {
+            window.fbq("trackCustom", name, payload);
+          }
+          if (window.ttq) {
+            window.ttq.track(name, payload);
+          }
+        }
+
+        function flushQueue() {
+          if (!window.gtag) return;
+          while (queue.length) {
+            var item = queue.shift();
+            window.gtag("event", item[0], item[1]);
+          }
+        }
+
+        function loadGtag() {
+          if (!config.gaId || window.gtag) return;
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            window.dataLayer.push(arguments);
+          }
+          window.gtag = gtag;
+          gtag("js", new Date());
+          gtag("config", config.gaId, { send_page_view: false });
+          var s = document.createElement("script");
+          s.async = true;
+          s.src = "https://www.googletagmanager.com/gtag/js?id=" + config.gaId;
+          document.head.appendChild(s);
+        }
+
+        function loadMeta() {
+          if (!config.metaPixelId || window.fbq) return;
+          !(function (f, b, e, v, n, t, s) {
+            if (f.fbq) return;
+            n = f.fbq = function () {
+              n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+            };
+            if (!f._fbq) f._fbq = n;
+            n.push = n;
+            n.loaded = true;
+            n.version = "2.0";
+            n.queue = [];
+            t = b.createElement(e);
+            t.async = true;
+            t.src = v;
+            s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s);
+          })(window, document, "script", "https://connect.facebook.net/en_US/fbevents.js");
+          window.fbq("init", config.metaPixelId);
+          window.fbq("track", "PageView");
+        }
+
+        function loadTiktok() {
+          if (!config.tiktokPixelId || window.ttq) return;
+          !(function (w, d, t) {
+            w.TiktokAnalyticsObject = t;
+            var ttq = (w[t] = w[t] || []);
+            ttq.methods = [
+              "page",
+              "track",
+              "identify",
+              "instances",
+              "debug",
+              "on",
+              "off",
+              "once",
+              "ready",
+              "alias",
+              "group",
+              "enableCookie",
+              "disableCookie",
+            ];
+            ttq.setAndDefer = function (t, e) {
+              t[e] = function () {
+                t.push([e].concat([].slice.call(arguments, 0)));
+              };
+            };
+            for (var i = 0; i < ttq.methods.length; i++) {
+              ttq.setAndDefer(ttq, ttq.methods[i]);
+            }
+            ttq.instance = function (t) {
+              var e = ttq._i[t] || [];
+              for (var n = 0; n < ttq.methods.length; n++) {
+                ttq.setAndDefer(e, ttq.methods[n]);
+              }
+              return e;
+            };
+            ttq.load = function (e, n) {
+              var i = "https://analytics.tiktok.com/i18n/pixel/events.js";
+              ttq._i = ttq._i || {};
+              ttq._i[e] = [];
+              ttq._t = ttq._t || {};
+              ttq._t[e] = +new Date();
+              ttq._o = ttq._o || {};
+              ttq._o[e] = n || {};
+              var o = d.createElement("script");
+              o.type = "text/javascript";
+              o.async = true;
+              o.src = i + "?sdkid=" + e + "&lib=" + t;
+              var a = d.getElementsByTagName("script")[0];
+              a.parentNode.insertBefore(o, a);
+            };
+          })(window, document, "ttq");
+          window.ttq.load(config.tiktokPixelId);
+          window.ttq.page();
+        }
+
+        function deferLoad(fn) {
+          if (document.readyState === "complete") {
+            if ("requestIdleCallback" in window) {
+              window.requestIdleCallback(fn, { timeout: 1500 });
+            } else {
+              setTimeout(fn, 1200);
+            }
+            return;
+          }
+          window.addEventListener(
+            "load",
+            function () {
+              if ("requestIdleCallback" in window) {
+                window.requestIdleCallback(fn, { timeout: 1500 });
+              } else {
+                setTimeout(fn, 800);
+              }
+            },
+            { once: true }
+          );
+        }
+
+        deferLoad(function () {
+          loadGtag();
+          loadMeta();
+          loadTiktok();
+          flushQueue();
+
+          if (!sent.page_view) {
+            sent.page_view = true;
+            sendEvent("page_view", {
+              page_location: window.location.href,
+              page_title: document.title,
+            });
+          }
+
+          var node = document.getElementById("of-analytics");
+          if (node) {
+            try {
+              var payload = JSON.parse(node.textContent || "{}");
+              if (payload.page_type === "view_item_list" && !sent.view_item_list) {
+                sent.view_item_list = true;
+                sendEvent("view_item_list", payload);
+              }
+              if (payload.page_type === "view_item" && !sent.view_item) {
+                sent.view_item = true;
+                sendEvent("view_item", payload);
+              }
+            } catch (e) {
+              // ignore malformed analytics payload
+            }
+          }
+        });
+
+        var scrollMarks = [25, 50, 75, 90];
+        var seen = {};
+        var scrollTick = false;
+        function onScroll() {
+          if (scrollTick) return;
+          scrollTick = true;
+          requestAnimationFrame(function () {
+            var h = document.documentElement;
+            var scrollTop = h.scrollTop || document.body.scrollTop;
+            var scrollHeight = h.scrollHeight - h.clientHeight;
+            var percent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            scrollMarks.forEach(function (mark) {
+              if (!seen[mark] && percent >= mark) {
+                seen[mark] = true;
+                sendEvent("scroll_depth", { percent: mark });
+              }
+            });
+            scrollTick = false;
+          });
+        }
+        window.addEventListener("scroll", onScroll, { passive: true });
+
+        document.addEventListener("click", function (event) {
+          var target = event.target;
+          if (!target) return;
+          var link = target.closest ? target.closest("a") : null;
+          if (!link) return;
+          var href = link.getAttribute("href") || "";
+          var placement = link.getAttribute("data-of-placement") || "";
+
+          if (href.indexOf("/go/kaspi/") === 0) {
+            var parts = href.split("?")[0].split("/");
+            var slug = parts.length ? parts[parts.length - 1] : "";
+            sendEvent("cta_click_to_kaspi", { slug: slug, placement: placement, href: href });
+            return;
+          }
+
+          if (href.indexOf("https://wa.me") === 0) {
+            sendEvent("contact_click_whatsapp", { placement: placement, href: href });
+            return;
+          }
+
+          if (href.indexOf("tel:") === 0) {
+            sendEvent("contact_click_call", { placement: placement, href: href });
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

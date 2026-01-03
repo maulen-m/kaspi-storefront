@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import LandingLayout from "../../layouts/LandingLayout.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import { getProductBySlug } from "../../lib/products";
 
@@ -53,7 +53,7 @@ const analytics =
     : null;
 ---
 
-<BaseLayout title={lander.title} description={lander.description ?? ""} analytics={analytics}>
+<LandingLayout title={lander.title} description={lander.description ?? ""} analytics={analytics}>
   <div class="container">
     <section class="hero">
       <div class="hero__copy">
@@ -131,4 +131,4 @@ const analytics =
       ) : null
     }
   </div>
-</BaseLayout>
+</LandingLayout>
