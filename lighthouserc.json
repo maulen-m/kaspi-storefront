@@ -4,9 +4,10 @@
       "startServerCommand": "pnpm preview -- --port 4321",
       "startServerReadyPattern": "localhost:4321",
       "url": [
-        "http://localhost:4321/",
-        "http://localhost:4321/shop",
-        "http://localhost:4321/p/performance-training-tee"
+        "http://127.0.0.1:4321/",
+        "http://127.0.0.1:4321/shop",
+        "http://127.0.0.1:4321/p/performance-training-tee",
+        "http://127.0.0.1:4321/l/launch"
       ],
       "numberOfRuns": 1,
       "settings": {

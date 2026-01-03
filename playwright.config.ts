@@ -5,12 +5,12 @@ export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 5_000 },
   use: {
-    baseURL: "http://localhost:4321",
+    baseURL: "http://127.0.0.1:4321",
     trace: "on-first-retry",
   },
   webServer: {
     command: "pnpm preview -- --port 4321",
-    url: "http://localhost:4321",
+    url: "http://127.0.0.1:4321",
     reuseExistingServer: !process.env.CI,
   },
 });

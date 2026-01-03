@@ -23,3 +23,10 @@ test("product page has Kaspi CTA", async ({ page }) => {
   const cta = page.locator("a[href^='/go/kaspi/']");
   await expect(cta.first()).toBeVisible();
 });
+
+test("landing has Kaspi CTA and countdown", async ({ page }) => {
+  await page.goto("/l/launch");
+  const cta = page.locator("a[href^='/go/kaspi/']");
+  await expect(cta.first()).toBeVisible();
+  await expect(page.locator("[data-countdown]")).toBeVisible();
+});
