@@ -1,0 +1,144 @@
+---
+const {
+  mode,
+  endIso,
+  hours,
+  storageKey = "of_countdown_deadline",
+  label = "До конца предложения",
+} = Astro.props;
+---
+
+<div
+  class="countdown"
+  data-countdown
+  data-mode={mode}
+  data-end-iso={endIso}
+  data-hours={hours}
+  data-storage-key={storageKey}
+  role="timer"
+  aria-live="polite"
+  aria-label="00:00:00"
+>
+  <span class="countdown__label">{label}</span>
+  <span class="countdown__segment" aria-hidden="true">
+    <span class="countdown__digit" data-digit="h1">0</span>
+    <span class="countdown__digit" data-digit="h2">0</span>
+  </span>
+  <span class="countdown__sep" aria-hidden="true">:</span>
+  <span class="countdown__segment" aria-hidden="true">
+    <span class="countdown__digit" data-digit="m1">0</span>
+    <span class="countdown__digit" data-digit="m2">0</span>
+  </span>
+  <span class="countdown__sep" aria-hidden="true">:</span>
+  <span class="countdown__segment" aria-hidden="true">
+    <span class="countdown__digit" data-digit="s1">0</span>
+    <span class="countdown__digit" data-digit="s2">0</span>
+  </span>
+</div>
+
+<script is:inline>
+  (function () {
+    var nodes = document.querySelectorAll("[data-countdown]");
+    if (!nodes.length) return;
+
+    var prefersReduced =
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function readCookie(name) {
+      var match = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+      return match ? decodeURIComponent(match[1]) : "";
+    }
+
+    function setCookie(name, value, maxAgeSeconds) {
+      document.cookie =
+        name +
+        "=" +
+        encodeURIComponent(value) +
+        "; Path=/; Max-Age=" +
+        maxAgeSeconds +
+        "; SameSite=Lax";
+    }
+
+    function setDigit(el, value) {
+      if (!el || el.textContent === value) return;
+      if (prefersReduced) {
+        el.textContent = value;
+        return;
+      }
+      el.classList.remove("is-flipping");
+      // Force reflow to restart animation.
+      void el.offsetWidth;
+      el.textContent = value;
+      el.classList.add("is-flipping");
+    }
+
+    nodes.forEach(function (root) {
+      var mode = root.dataset.mode || "fixed";
+      var endIso = root.dataset.endIso || "";
+      var hours = Number(root.dataset.hours || "0");
+      var storageKey = root.dataset.storageKey || "of_countdown_deadline";
+
+      var deadline = 0;
+      if (mode === "evergreen") {
+        var stored = "";
+        try {
+          stored = localStorage.getItem(storageKey) || "";
+        } catch (e) {
+          stored = "";
+        }
+        if (!stored) {
+          stored = readCookie(storageKey) || "";
+        }
+        var storedValue = Number(stored);
+        if (Number.isFinite(storedValue) && storedValue > 0) {
+          deadline = storedValue;
+        } else {
+          deadline = Date.now() + Math.max(0, hours) * 60 * 60 * 1000;
+          try {
+            localStorage.setItem(storageKey, String(deadline));
+          } catch (e) {
+            // ignore storage errors
+          }
+          setCookie(storageKey, String(deadline), 60 * 60 * 24 * 30);
+        }
+      } else {
+        var parsed = Date.parse(endIso);
+        deadline = Number.isFinite(parsed) ? parsed : 0;
+      }
+
+      var digits = {
+        h1: root.querySelector('[data-digit="h1"]'),
+        h2: root.querySelector('[data-digit="h2"]'),
+        m1: root.querySelector('[data-digit="m1"]'),
+        m2: root.querySelector('[data-digit="m2"]'),
+        s1: root.querySelector('[data-digit="s1"]'),
+        s2: root.querySelector('[data-digit="s2"]'),
+      };
+
+      function update() {
+        var now = Date.now();
+        var remaining = Math.max(0, deadline - now);
+        var totalSeconds = Math.floor(remaining / 1000);
+        var hoursLeft = Math.floor(totalSeconds / 3600);
+        var minutesLeft = Math.floor((totalSeconds % 3600) / 60);
+        var secondsLeft = totalSeconds % 60;
+
+        var hh = String(hoursLeft).padStart(2, "0");
+        var mm = String(minutesLeft).padStart(2, "0");
+        var ss = String(secondsLeft).padStart(2, "0");
+
+        setDigit(digits.h1, hh[0]);
+        setDigit(digits.h2, hh[1]);
+        setDigit(digits.m1, mm[0]);
+        setDigit(digits.m2, mm[1]);
+        setDigit(digits.s1, ss[0]);
+        setDigit(digits.s2, ss[1]);
+
+        root.setAttribute("aria-label", hh + ":" + mm + ":" + ss);
+      }
+
+      update();
+      setInterval(update, 1000);
+    });
+  })();
+</script>
