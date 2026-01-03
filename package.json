@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "format": "prettier --check .",
     "typecheck": "astro check --noSync",
-    "test": "vitest run",
+    "test": "node --require ./scripts/localhost_patch.cjs ./node_modules/vitest/vitest.mjs run",
     "test:e2e": "playwright test",
     "lhci": "lhci autorun",
     "verify": "pnpm lint && pnpm format && pnpm typecheck && pnpm test && pnpm build"
